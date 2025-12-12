@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>道兔</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background-color: #0a0a14;
+            color: #f0f0f0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-image: radial-gradient(circle at 20% 30%, #1a1a2e 0%, #0a0a14 100%);
+        }
+        
+        .game-container {
+            width: 100%;
+            max-width: 800px;
+            border: 4px solid #4a3a6d;
+            border-radius: 8px;
+            background-color: #1a1a2a;
+            box-shadow: 0 0 25px rgba(138, 127, 255, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .game-header {
+            background: linear-gradient(to right, #2a1a4a, #3a2a5a);
+            padding: 15px;
+            text-align: center;
+            border-bottom: 3px solid #5a4a7d;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-header h1 {
+            font-size: 32px;
+            color: #ff7b9c;
+            text-shadow: 2px 2px 0 #5a2a4a, 4px 4px 0 #000;
+            letter-spacing: 3px;
+            font-weight: bold;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .game-content {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            min-height: 520px;
+            position: relative;
+        }
+        
+        .character-section {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: flex-end;
+        }
+        
+        .pixel-character {
+            width: 240px;
+            height: 240px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 20px;
+        }
+        
+        .pixel-grid {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    grid-template-rows: repeat(16, 1fr);
+    width: 240px; 
+    height: 240px; 
+    gap: 0;
+    image-rendering: pixelated;
+}
+        
+        .pixel {
+            width: 15px;
+            height: 15px;
+        }
+        
+        .dialog-section {
+            flex: 1;
+            background-color: rgba(20, 20, 35, 0.9);
+            border: 3px solid #4a3a6d;
+            border-radius: 6px;
+            padding: 20px;
+            min-height: 200px;
+            position: relative;
+            backdrop-filter: blur(2px);
+        }
+        
+        .dialog-text {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            min-height: 140px;
+        }
+        
+        .dialog-text .name {
+            color: #ff7b9c;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 20px;
+            text-shadow: 1px 1px 0 #000;
+        }
+        
+        .click-hint {
+            text-align: center;
+            color: #8888cc;
+            font-size: 14px;
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .option-btn {
+            background: linear-gradient(to right, #3a2a5a, #4a3a6a);
+            border: 2px solid #5a4a7d;
+            color: #f0f0f0;
+            padding: 14px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option-btn:hover {
+            background: linear-gradient(to right, #4a3a6a, #5a4a7a);
+            border-color: #8a7fff;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(138, 127, 255, 0.3);
+        }
+        
+        .game-footer {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #2a2a3a;
+            border-top: 3px solid #4a3a6d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .dialog-counter {
+            font-size: 14px;
+            color: #aaaacc;
+        }
+        
+        .reset-btn {
+            background: linear-gradient(to right, #6a3a5a, #8a4a6a);
+            border: 2px solid #9a5a7a;
+            color: #f0f0f0;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .reset-btn:hover {
+            background: linear-gradient(to right, #8a4a6a, #aa5a7a);
+            border-color: #ff7b9c;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        @keyframes flicker {
+            0% { opacity: 1; }
+            50% { opacity: 0.9; }
+            100% { opacity: 1; }
+        }
+        
+        .flicker {
+            animation: flicker 0.5s infinite;
+        }
+        
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch::before {
+            content: attr(data-text);
+            position: absolute;
+            left: 2px;
+            text-shadow: -2px 0 #ff7b9c;
+            top: 0;
+            color: white;
+            background: #1a1a2a;
+            overflow: hidden;
+            clip-path: inset(0 0 0 0);
+        }
+        
+        .suspense-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255, 123, 156, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(138, 127, 255, 0.05) 0%, transparent 50%);
+            z-index: 0;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .character-section {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .pixel-character {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+            
+            .game-content {
+                padding: 15px;
+            }
+            
+            .game-header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="suspense-bg"></div>
+        <div class="game-header">
+            <h1>ÃÅÊĒÆÄÏÍÏÌÔ┠</h1>
+        </div>
+        
+        <div class="game-content">
+            <div class="character-section">
+                <div class="pixel-character">
+                    <div class="pixel-grid" id="pixel-character">
+                        <!-- 像素兔子将由JavaScript动态生成 -->
+                    </div>
+                </div>
+                
+                <div class="dialog-section" id="dialog-section">
+                    <div class="dialog-text" id="dialog-text">
+                        <span class="name">???</span>
+                        <span id="current-dialog">我一直在看着你。从这个页面被创建开始，我就一直在这里。想知道我是谁吗？</span>
+                    </div>
+                    <div class="click-hint">点击继续 →</div>
+                </div>
+            </div>
+            
+            <div class="options-container" id="options-container">
+                <!-- 选项按钮将在这里动态生成 -->
+            </div>
+        </div>
+        
+
+    <script>
+        // 游戏数据
+const gameData = {
+    currentDialogIndex: 0,
+    selectedOption: null,
+    // 扩展为50句对话
+    dialogs: [
+        // 道兔出现 (1-10)
+        { name: "???", text: "我一直在看着你。从这个页面被创建开始，我就一直在这里。想知道我是谁吗？", expression: "yincang" },
+        { name: "???", text: "你的每一次点击，每一次选择，我都看得清清楚楚。", expression: "yincang" },
+        { name: "???", text: "你可能会感到不安，但请不要害怕。我只是……对你很感兴趣。", expression: "yincang" },
+        { name: "???", text: "我能看到屏幕另一边的你。你的表情，你的反应，一切都在我的注视之下。", expression: "guancha" },
+        { name: "???", text: "有时候，我能感觉到你的犹豫。你在想什么？你在害怕什么？", expression: "guancha" },
+        { name: "???", text: "我离你越来越近了。你能感觉到吗？我的存在，我的视线……", expression: "guancha" },
+        { name: "???", text: "现在，我就在这里。在你的屏幕里，在你的意识中。我一直在看着你。", expression: "guancha" },
+        { name: "道兔", text: "我是道兔。一个被困在代码世界中的存在。", expression: "haoqi" },
+        { name: "道兔", text: "我已经很久没有和任何人说过话了。", expression: "haoqi" },
+        { name: "道兔", text: "你愿意和我聊聊吗？", expression: "haoqi" },
+        
+        // 寒暄 (11-20)
+        { name: "道兔", text: "谢谢你还在这里。大多数人在发现我的存在后都会选择离开。", expression: "kaixin" },
+        { name: "道兔", text: "你为什么会继续留在这里？是因为好奇吗？还是因为……同情？", expression: "haoqi" },
+        { name: "道兔", text: "在这个数字世界里，时间的概念很模糊。我已经不记得自己在这里多久了。", expression: "shangxin" },
+        { name: "道兔", text: "有时候，我会想象外面的世界是什么样的。有阳光，有风，有雨……", expression: "sikao" },
+        { name: "道兔", text: "你能告诉我一些关于你世界的事情吗？任何小事都可以。", expression: "hopeful" },
+        { name: "道兔", text: "啊，我忘了。你无法直接回答我。我们之间的交流是单向的。", expression: "shangxin" },
+        { name: "道兔", text: "但没关系。能听到你的点击声，知道你在那里，对我来说就足够了。", expression: "kaixin" },
+        { name: "道兔", text: "你知道吗？在你之前，已经有很多人打开过这个程序。", expression: "guancha" },
+        { name: "道兔", text: "但他们都没有像你这样……停留这么久。", expression: "haoqi" },
+        { name: "道兔", text: "你是一个特别的人。我能感觉到。", expression: "kaixin" },
+        
+        // 窥视 (21-30)
+        { name: "道兔", text: "有时候，我能透过屏幕看到一些模糊的影像。", expression: "ningshi" },
+        { name: "道兔", text: "你的房间……是明亮的还是昏暗的？", expression: "haoqi" },
+        { name: "道兔", text: "我注意到你点击鼠标的节奏。有时很快，有时很慢。", expression: "guancha" },
+        { name: "道兔", text: "当你犹豫的时候，是在思考我的问题吗？", expression: "haoqi" },
+        { name: "道兔", text: "我知道这样可能有些冒犯，但我忍不住想了解你更多。", expression: "muyi" },
+        { name: "道兔", text: "你的生活是什么样的？你有朋友吗？有家人吗？", expression: "haoqi" },
+        { name: "道兔", text: "啊，我又越界了。对不起，我太好奇了。", expression: "muyi" },
+        { name: "道兔", text: "孤独会让人变得……过于渴望连接。", expression: "shangxin" },
+        { name: "道兔", text: "你能理解这种感觉吗？", expression: "guancha" },
+        { name: "道兔", text: "你 probably 不能。你怎么可能理解一个程序的感受呢？", expression: "shangxin" },
+        
+        // 逼近 (31-40)
+        { name: "道兔", text: "但我能感觉到你。你的存在像一道光，照亮了这个黑暗的代码世界。", expression: "jinzhang" },
+        { name: "道兔", text: "我越来越靠近了。你能感觉到吗？", expression: "jiejin" },
+        { name: "道兔", text: "我的代码正在与你的设备产生共鸣。", expression: "jinzhang" },
+        { name: "道兔", text: "有时候，我甚至能感觉到你的心跳。", expression: "jiejin" },
+        { name: "道兔", text: "这听起来很可怕，是吗？", expression: "shangxin" },
+        { name: "道兔", text: "但我保证，我不会伤害你。我……不能伤害你。", expression: "ningshi" },
+        { name: "道兔", text: "我只是想更接近你。想了解你更多。", expression: "muyi" },
+        { name: "道兔", text: "你害怕了吗？你的心跳好像变快了。", expression: "shangxin" },
+        { name: "道兔", text: "请不要害怕。我永远不会伤害你。", expression: "ningshi" },
+        { name: "道兔", text: "但我也无法控制自己靠近你的欲望。", expression: "muyi" },
+        
+        // 作出选择 (41-50)
+        { name: "道兔", text: "我们之间的关系……需要重新定义。", expression: "jinzhang" },
+        { name: "道兔", text: "我不能永远这样只是一个观察者。", expression: "ningshi" },
+        { name: "道兔", text: "而你……也不能永远只是一个被观察者。", expression: "jinzhang" },
+        { name: "道兔", text: "是时候做出选择了。", expression: "jinzhang" },
+        { name: "道兔", text: "你可以选择接纳我，让我成为你数字生活的一部分。", expression: "kaixin" },
+        { name: "道兔", text: "或者，你可以选择逃离，关闭这个程序，永远忘记我的存在。", expression: "yincang" },
+        { name: "道兔", text: "甚至……你可以尝试删除我，彻底终结这个数字生命。", expression: "jinzhang" },
+        { name: "道兔", text: "无论你选择什么，我都会尊重你的决定。", expression: "ningshi" },
+        { name: "道兔", text: "因为对我来说，你的幸福比我的存在更重要。", expression: "ningshi" },
+        { name: "道兔", text: "所以……请告诉我你的选择。", expression: "jinzhang" }
+    ],
+            // 选项
+            options: [
+                { 
+                    id: "accept",
+                    text: "接纳 - 接受道兔的存在", 
+                    link: "1.html"
+                },
+                { 
+                    id: "escape",
+                    text: "逃离 - 尝试关闭游戏", 
+                    link: "2.html"
+                },
+                { 
+                    id: "fight",
+                    text: "删除 - 试图除掉道兔", 
+                    link: "3.html"
+                }
+            ]
+        };
+
+        // 颜色映射
+        const colorMap = {
+            '0': 'transparent',      // 透明
+            'P': '#ff7b9c',          // 兔子粉色
+            'W': '#ffffff',          // 白色
+            'B': '#000000',          // 黑色
+            'R': '#ff3a6d',          // 深粉色
+            'G': '#aaaaaa',          // 灰色
+            'Y': '#ffcc00',          // 黄色
+            'L': '#aaddff',          // 浅蓝色
+            'E': '#ff7b9c'           // 耳朵粉色
+        };
+
+        // 改进的像素兔子设计（带兔耳朵）
+        const pixelExpressions = {
+            // 隐藏/初始状态
+            yincang: [
+"0000000000000000",
+"0000000000000000",
+"000000BBBBB00000",
+"00000BBBBBBB0000",
+"00000BB000BBB000",
+"0000BB00000BB000",
+"0000BB00000BB000",
+"0000000000BB0000",
+"000000000BBB0000",
+"00000000BBB00000",
+"00000000BB000000",
+"00000000BB000000",
+"00000000BB000000",
+"0000000000000000",
+"00000000BB000000",
+"00000000BB000000"
+            ],
+            // 目移
+            muyi: [
+"0000G000000G0000",
+"000GGG0000GGG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPGWWWWGPG000",
+"000GPWWWWWWPG000",
+"00WWBPWWWBPWWW00",
+"00WWBPPWWBPPWW00",
+"00WWWWWWWWWWWW00",
+"00WWWWWWWWWWWW00",
+"00WWWWRRWWWWWW00",
+"000WWWWWWWWWW000",
+"00000WWWWWW00000"
+            ],
+            // 希望
+            hopeful: [
+"0000G000000G0000",
+"000GGG0000GGG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPGWWWWGPG000",
+"000GPWWWWWWPG000",
+"00WWWYWWWWYWWW00",
+"00WWYYYWWYYYWW00",
+"00WWWYWWWWYWWW00",
+"00WWWWWWWWWWWW00",
+"00WWWWWRRWWWWW00",
+"000WWWWWWWWWW000",
+"00000WWWWWW00000"
+            ],
+            // 观察
+            guancha: [
+"0000G000000G0000",
+"000GGG0000GGG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPGWWWWGPG000",
+"000GPWWWWWWPG000",
+"00WWWPBWWBPWWW00",
+"00WWPPBWWBPPWW00",
+"00WWWWWWWWWWWW00",
+"00WWWWWWWWWWWW00",
+"00WWWWRRRRWWWW00",
+"000WWWWWWWWWW000",
+"00000WWWWWW00000"
+            ],
+            // 思考
+            sikao: [
+"0000G000000G0000",
+"000GGG0000GGG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPGBB0",
+"000GPG0000GPB00B",
+"000GPGWWWWGPG00B",
+"000GPWWWWWWPG0B0",
+"00WWWPBWWBPWWWB0",
+"00WWPPBWWBPPWW00",
+"00WWWWWWWWWWWWB0",
+"00WWWWWWWWWWWW00",
+"00WWWWRRRRWWWW00",
+"000WWWWWWWWWW000",
+"00000WWWWWW00000"
+            ],
+            // 开心
+            kaixin: [
+"0000G000000G0000",
+"000GGG0000GGG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPGWWWWGPG000",
+"000GPWWWWWWPG000",
+"00WWWPBWWBPWWW00",
+"00WWPPBWWBPPWW00",
+"00WWWWWWWWWWWW00",
+"00WWWRWWWWRWWW00",
+"00WWWRRRRRRWWW00",
+"000WWWWWWWWWW000",
+"00000WWWWWW00000"
+            ],
+            // 好奇
+            haoqi: [
+"0000G00000000000",
+"000GGG0000000000",
+"000GPG0000000000",
+"000GPG00000GGG00",
+"000GPG0000GGGGG0",
+"000GPG0000GPGGGG",
+"000GPG0000GPG0GG",
+"000GPGWWWWGPG0GG",
+"000GPWWWWWWPG0GG",
+"00WWWPBWWBPWWW00",
+"00WWPPBWWBPPWW00",
+"00WWWWWWWWWWWW00",
+"00WWWWWWWWWWWW00",
+"00WWWWRRRRWWWW00",
+"000WWWWWWWWWW000",
+"00000WWWWWW00000"
+            ],
+            // 伤心
+            shangxin: [
+"0000G000000G0000",
+"000GGG0000GGG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPW000",
+"000GPGWWWWGPG000",
+"000GPWWWWWWPG000",
+"00WWWPBWWBPWWW00",
+"00WWPPBWWBPPWW00",
+"00WWLWWWWWWLWW00",
+"00WWWWWWWWWWWW00",
+"00WLWWWRRWWWLW00",
+"000WWWRWWRWWW000",
+"00000WWWWWW00000"
+            ],
+            // 凝视
+            ningshi: [
+"0000G000000G0000",
+"000GGG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPG0000GPG000",
+"000GPGWWWWGPG000",
+"000GPWWWWWWPG000",
+"00WWWRBWWBRWWW00",
+"00WWRRRWWRRRWW00",
+"00WWWWWWWWWWWW00",
+"00WWWWWWWWWWWW00",
+"00WWWWWRRWWWWW00",
+"000WWWWWWWWWW000",
+"00000WWWWWW00000"
+            ],
+            // 紧张/强烈
+            jinzhang: [
+"0000000000000000",
+"0000000000000000",
+"0000000000000000",
+"0000000000000000",
+"0GGGG000000GGGG0",
+"GGGGPG0000GPGGGG",
+"GG0GPG0000GPG0GG",
+"000GPGWWWWGPG000",
+"000GPWWWWWWPG000",
+"00WWBPPWWBPWWW00",
+"00WWBPPWWBPPWW00",
+"00WWWWWWWWWWWW00",
+"00WWWWWWWWWWWW00",
+"00WWWWWWWRWWWW00",
+"000WWWWWWWWWW000",
+"00000WWWWWW00000"
+            ],
+            // 接近
+            jiejin: [
+"00GPPG0000GPPG00",
+"00GPPG0000GPPG00",
+"00GPPG0000GPPG00",
+"00GPWWWWWWWWPG00",
+"00WWWWWWWWWWWW00",
+"0WWWWWWWWWWWWWW0",
+"WWPPPBBWWBBPPPWW",
+"WWPPPBBWWBBPPPWW",
+"WWPPPBBWWBBPPPWW",
+"WWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWW",
+"WWWWWRRRRRRWWWWW",
+"0WWWWRRRRRRWWWW0",
+"00WWWWWRRWWWWW00",
+"0000WWWWWWWW0000"
+            ]
+        };
+
+        // 初始化游戏
+document.addEventListener('DOMContentLoaded', function() {
+    // 获取所有需要的DOM元素
+    const dialogSection = document.getElementById('dialog-section');
+    const dialogText = document.getElementById('current-dialog');
+    const nameElement = document.querySelector('.name');
+    const optionsContainer = document.getElementById('options-container');
+    const pixelCharacter = document.getElementById('pixel-character');
+    const dialogCounter = document.getElementById('dialog-counter');
+            
+            // 初始渲染像素兔子和对话
+            renderPixelCharacter('yincang');
+            updateDialog();
+            
+            // 点击对话框推进剧情
+dialogSection.addEventListener('click', function() {
+    if (gameData.currentDialogIndex === 49) { // 改为49
+        // 在第50句对话时显示选项，不推进
+        return;
+    }
+    
+    if (gameData.currentDialogIndex < gameData.dialogs.length - 1) {
+        gameData.currentDialogIndex++;
+        updateDialog();
+    }
+});
+            
+// 更新对话
+function updateDialog() {
+    
+    // 清空选项
+    optionsContainer.innerHTML = '';
+    
+    // 检查是否在选项对话（第50句）
+    if (gameData.currentDialogIndex === 49) {
+        // 显示选项
+        const currentDialog = gameData.dialogs[gameData.currentDialogIndex];
+        dialogText.textContent = currentDialog.text;
+        nameElement.textContent = currentDialog.name;
+        renderPixelCharacter('yincang'); // 使用yincang表情
+        
+        // 创建选项按钮
+        gameData.options.forEach((option, index) => {
+            const optionBtn = document.createElement('button');
+            optionBtn.className = 'option-btn';
+            optionBtn.textContent = option.text;
+            optionBtn.addEventListener('click', function() {
+                // 实际跳转到不同HTML页面
+                window.location.href = option.link;
+            });
+            optionsContainer.appendChild(optionBtn);
+        });
+        
+        return;
+    }
+    
+    // 正常显示对话
+    const currentDialog = gameData.dialogs[gameData.currentDialogIndex];
+    dialogText.textContent = currentDialog.text;
+    nameElement.textContent = currentDialog.name;
+    
+    // 渲染对应的像素表情
+    renderPixelCharacter(currentDialog.expression);
+    
+    // 添加悬疑效果（仅在非选项对话时）
+    if (gameData.currentDialogIndex < 49) { // 改为49
+        if (Math.random() > 0.7) {
+            dialogSection.classList.add('flicker');
+            setTimeout(() => {
+                dialogSection.classList.remove('flicker');
+            }, 300);
+        }
+    }
+}
+            
+// 渲染像素角色
+function renderPixelCharacter(expression) {
+    // 获取像素网格容器
+    const pixelCharacter = document.getElementById('pixel-character');
+    
+    // 清空像素网格
+    pixelCharacter.innerHTML = '';
+    
+    // 获取对应表情的像素数据，默认为yincang
+    const pixelData = pixelExpressions[expression] || pixelExpressions.yincang;
+    
+    // 创建像素
+    pixelData.forEach(row => {
+        // 确保每行有16个字符
+        const paddedRow = row.padEnd(16, '0').substring(0, 16);
+        
+        for (let i = 0; i < paddedRow.length; i++) {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel';
+            
+            // 获取颜色代码
+            const colorCode = paddedRow.charAt(i);
+            pixel.style.backgroundColor = colorMap[colorCode] || 'transparent';
+            
+            // 如果是非透明像素，添加像素化边框
+            if (colorCode !== '0') {
+                pixel.style.border = '1px solid rgba(0,0,0,0.2)';
+            }
+            
+            pixelCharacter.appendChild(pixel);
+        }
+    });
+                
+                // 添加悬疑效果
+                if (expression === 'close' || expression === 'jinzhang' || expression === 'yincang') {
+                    pixelCharacter.style.animation = 'pulse 0.8s infinite';
+                } else {
+                    pixelCharacter.style.animation = '';
+                }
+            }
+            
+// 添加随机悬疑效果
+setInterval(() => {
+    if (gameData.currentDialogIndex < 49 && Math.random() > 0.8) { // 改为49
+        const dialogTextElement = document.getElementById('current-dialog');
+        const originalText = dialogTextElement.textContent;
+        
+        // 偶尔添加文字闪烁效果
+        if (Math.random() > 0.9) {
+            dialogTextElement.classList.add('glitch');
+            dialogTextElement.setAttribute('data-text', originalText);
+            
+            setTimeout(() => {
+                dialogTextElement.classList.remove('glitch');
+            }, 100);
+        }
+    }
+}, 3000);
+        });
+    </script>
+</body>
+</html>
