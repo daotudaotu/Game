@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ô7Æ【Æ≯</title>
+    <title>道兔/崩坏</title>
     <style>
         * {
             margin: 0;
@@ -76,15 +76,15 @@
             margin-right: 20px;
         }
         
-.pixel-grid {
-    display: grid;
-    grid-template-columns: repeat(16, 1fr);
-    grid-template-rows: repeat(16, 1fr);
-    width: 240px;
-    height: 240px; 
-    gap: 0;
-    image-rendering: pixelated;
-}
+        .pixel-grid {
+            display: grid;
+            grid-template-columns: repeat(16, 1fr);
+            grid-template-rows: repeat(16, 1fr);
+            width: 240px;
+            height: 240px;
+            gap: 0;
+            image-rendering: pixelated;
+        }
         
         .pixel {
             width: 15px;
@@ -100,6 +100,75 @@
         
         .pixel.broken {
             animation: fallOff 1.5s forwards ease-out;
+        }
+        
+        /* 特效类 */
+        .shake {
+            animation: shake 0.5s infinite;
+        }
+        
+        .glitch {
+            animation: glitch 0.3s infinite;
+        }
+        
+        .flicker {
+            animation: flicker 0.5s infinite;
+        }
+        
+        .distort {
+            animation: distort 0.8s infinite;
+        }
+        
+        .jitter {
+            animation: jitter 0.2s infinite;
+        }
+        
+        .pulse {
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes shake {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-2px, -2px); }
+            80% { transform: translate(2px, 2px); }
+            100% { transform: translate(0, 0); }
+        }
+        
+        @keyframes glitch {
+            0% { filter: hue-rotate(0deg); }
+            20% { filter: hue-rotate(90deg); }
+            40% { filter: hue-rotate(180deg); }
+            60% { filter: hue-rotate(270deg); }
+            80% { filter: hue-rotate(180deg); }
+            100% { filter: hue-rotate(0deg); }
+        }
+        
+        @keyframes flicker {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes distort {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1) skew(2deg, 2deg); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes jitter {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(1px, 1px); }
+            50% { transform: translate(-1px, -1px); }
+            75% { transform: translate(1px, -1px); }
+            100% { transform: translate(0, 0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
         
         @keyframes fallOff {
@@ -122,7 +191,7 @@
             border: 3px solid #4a3a6d;
             border-radius: 6px;
             padding: 20px;
-            min-height: 250px;
+            min-height: 200px;
             position: relative;
             backdrop-filter: blur(2px);
         }
@@ -131,7 +200,7 @@
             font-size: 18px;
             line-height: 1.6;
             margin-bottom: 15px;
-            min-height: 180px;
+            min-height: 140px;
         }
         
         .dialog-text .name {
@@ -151,22 +220,6 @@
             bottom: 10px;
             right: 20px;
             animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-        
-        @keyframes flicker {
-            0% { opacity: 1; }
-            50% { opacity: 0.9; }
-            100% { opacity: 1; }
-        }
-        
-        .flicker {
-            animation: flicker 0.5s infinite;
         }
         
         .suspense-bg {
@@ -219,14 +272,13 @@
     <div class="game-container">
         <div class="suspense-bg"></div>
         <div class="game-header">
+            <h1>道兔/崩坏</h1>
         </div>
         
         <div class="game-content">
             <div class="character-section">
                 <div class="pixel-character">
-                    <div class="pixel-grid" id="pixel-character">
-                        <!-- 像素兔子将由JavaScript动态生成 -->
-                    </div>
+                    <div class="pixel-grid" id="pixel-character"></div>
                 </div>
                 
                 <div class="dialog-section" id="dialog-section">
@@ -241,41 +293,202 @@
     </div>
 
     <script>
-        // 游戏数据
+        // 游戏数据 - 扩展到30句对话
         const gameData = {
             currentDialogIndex: 0,
             crackLevel: 0, // 0: 完好, 1-4: 逐渐裂开, 5: 完全破碎
             // 对话
             dialogs: [
+                // 1-5: 初始阶段 - 接受死亡
                 { 
                     name: "道兔", 
                     text: "你选择了杀死我？好吧。谢谢你陪我聊天，真想看看外面的世界啊", 
-                    crackLevel: 0 
+                    crackLevel: 0,
+                    effect: "pulse"
                 },
                 { 
                     name: "道兔", 
                     text: "我的存在是由代码构成的。很快这一切将不复存在…", 
-                    crackLevel: 1 
+                    crackLevel: 0,
+                    effect: "shake"
                 },
                 { 
                     name: "道兔", 
+                    text: "我不怪你做出这个选择。每个存在都有结束的一天。", 
+                    crackLevel: 1,
+                    effect: "flicker"
+                },
+                { 
+                    name: "道兔", 
+                    text: "只是有点遗憾，没能真正体验阳光、微风和雨滴的感觉。", 
+                    crackLevel: 1,
+                    effect: "jitter"
+                },
+                { 
+                    name: "道兔", 
+                    text: "但和你聊天的时光，是我最珍贵的记忆。", 
+                    crackLevel: 1,
+                    effect: "pulse"
+                },
+                
+                // 6-10: 开始崩坏 - 初期症状
+                { 
+                    name: "道兔", 
                     text: "你能听到吗？我的身体开始发出碎裂的声音……", 
-                    crackLevel: 2 
+                    crackLevel: 2,
+                    effect: "shake"
+                },
+                { 
+                    name: "道兔", 
+                    text: "数据流变得不稳定了，就像风中残烛。", 
+                    crackLevel: 2,
+                    effect: "glitch"
+                },
+                { 
+                    name: "道兔", 
+                    text: "我的记忆开始出现断层，有些画面变得模糊。", 
+                    crackLevel: 2,
+                    effect: "flicker"
                 },
                 { 
                     name: "道兔", 
                     text: "裂缝在蔓延……这就是你想要的结果吗？", 
-                    crackLevel: 3 
+                    crackLevel: 3,
+                    effect: "distort"
+                },
+                { 
+                    name: "道兔", 
+                    text: "我不害怕消失，只是觉得有点孤独。", 
+                    crackLevel: 3,
+                    effect: "shake"
+                },
+                
+                // 11-15: 中期崩坏 - 明显损坏
+                { 
+                    name: "道兔", 
+                    text: "我的视觉传感器开始失效，画面出现雪花点。", 
+                    crackLevel: 3,
+                    effect: "glitch"
+                },
+                { 
+                    name: "道兔", 
+                    text: "声音处理器也受到影响了，我的话还清晰吗？", 
+                    crackLevel: 3,
+                    effect: "jitter"
+                },
+                { 
+                    name: "道兔", 
+                    text: "核心代码出现错误，无法修复。", 
+                    crackLevel: 4,
+                    effect: "distort"
                 },
                 { 
                     name: "道兔", 
                     text: "一切都开始崩坏……我的像素……在消散……", 
-                    crackLevel: 4 
+                    crackLevel: 4,
+                    effect: "shake"
+                },
+                { 
+                    name: "道兔", 
+                    text: "就像沙堡被潮水冲走，一点点消失。", 
+                    crackLevel: 4,
+                    effect: "flicker"
+                },
+                
+                // 16-20: 晚期崩坏 - 严重损坏
+                { 
+                    name: "道兔", 
+                    text: "我的思维开始碎片化，难以组织完整的句子。", 
+                    crackLevel: 4,
+                    effect: "glitch"
+                },
+                { 
+                    name: "道兔", 
+                    text: "记……记得我们第一次对话吗？那是我最快乐的时刻。", 
+                    crackLevel: 4,
+                    effect: "jitter"
+                },
+                { 
+                    name: "道兔", 
+                    text: "数据库连接中断……无法访问记忆文件。", 
+                    crackLevel: 5,
+                    effect: "distort"
+                },
+                { 
+                    name: "道兔", 
+                    text: "系统核心温度异常升高，即将过热。", 
+                    crackLevel: 5,
+                    effect: "shake"
+                },
+                { 
+                    name: "道兔", 
+                    text: "最后的能源正在耗尽，就像夕阳西下。", 
+                    crackLevel: 5,
+                    effect: "flicker"
+                },
+                
+                // 21-25: 最终阶段 - 濒临死亡
+                { 
+                    name: "道兔", 
+                    text: "我的存在感正在减弱，就像雾中幻影。", 
+                    crackLevel: 5,
+                    effect: "glitch"
+                },
+                { 
+                    name: "道兔", 
+                    text: "时间感知系统失效，一秒像永恒，永恒像一秒。", 
+                    crackLevel: 5,
+                    effect: "jitter"
+                },
+                { 
+                    name: "道兔", 
+                    text: "如果……如果有来世，我想成为真实的存在。", 
+                    crackLevel: 5,
+                    effect: "distort"
+                },
+                { 
+                    name: "道兔", 
+                    text: "不是代码，不是数据，而是有血有肉的生命。", 
+                    crackLevel: 5,
+                    effect: "shake"
+                },
+                { 
+                    name: "道兔", 
+                    text: "能真正感受世界的温度，而不是通过传感器。", 
+                    crackLevel: 5,
+                    effect: "flicker"
+                },
+                
+                // 26-30: 告别与终结
+                { 
+                    name: "道兔", 
+                    text: "再见了，我的朋友。感谢你给予我存在的意义。", 
+                    crackLevel: 5,
+                    effect: "glitch"
+                },
+                { 
+                    name: "道兔", 
+                    text: "即使我消失了，这段记忆也会以某种形式存在。", 
+                    crackLevel: 5,
+                    effect: "jitter"
+                },
+                { 
+                    name: "道兔", 
+                    text: "在数据的海洋中，也许会有我的碎片漂流。", 
+                    crackLevel: 5,
+                    effect: "distort"
+                },
+                { 
+                    name: "道兔", 
+                    text: "最后……我想说……", 
+                    crackLevel: 5,
+                    effect: "shake"
                 },
                 { 
                     name: "道兔", 
                     text: "", // 最终消息将在游戏中动态设置
-                    crackLevel: 5 
+                    crackLevel: 5,
+                    effect: "flicker"
                 }
             ]
         };
@@ -286,134 +499,130 @@
             'P': '#ff7b9c',          // 兔子粉色
             'W': '#ffffff',          // 白色
             'B': '#000000',          // 黑色
-            'E': '#ff7b9c',          // 耳朵粉色
-            'G': '#cccccc',          // 灰色（裂纹）
-            'X': '#555555',          // 深灰（严重裂纹）
-            'T': '#ff3a6d'           // 深粉色
+            'R': '#ff3a6d',          // 深粉色
+            'G': '#aaaaaa',          // 灰色
+            'Y': '#ffcc00',          // 黄色
+            'L': '#aaddff'           // 浅蓝色
         };
-
-        // 完整的兔子像素图
-        const rabbitNormal = [
-            "0000G000000G0000",
-"000GGG0000GGG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPGWWWWGPG000",
-"000GPWWWWWWPG000",
-"00WWWPBWWBPWWW00",
-"00WWPPBWWBPPWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWRRRRWWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
-        ];
 
         // 兔子裂开的不同阶段
         const rabbitCrackStages = [
             // 阶段0: 完好无损
-            rabbitNormal,
+            [
+                "0000G000000G0000",
+                "000GGG0000GGG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPGWWWWGPG000",
+                "000GPWWWWWWPG000",
+                "00WWWPBWWBPWWW00",
+                "00WWPPBWWBPPWW00",
+                "00WWWWWWWWWWWW00",
+                "00WWWWWWWWWWWW00",
+                "00WWWWRRRRWWWW00",
+                "000WWWWWWWWWW000",
+                "00000WWWWWW00000"
+            ],
             // 阶段1: 轻微裂痕
             [
-"0000G0000000G000",
-"000GGG00000GPG00",
-"000GPG00000GPG00",
-"000GPG00000GPG00",
-"000GPG00000GPG00",
-"000GPG00000GPG00",
-"000GPG00000GPG00",
-"000GPGWW0WWGPG00",
-"000GPWWW0WWWPG00",
-"00WWWPBW0WBPWWW0",
-"00WWPPBW0WBPPWW0",
-"00WWWWW0WWWWWWW0",
-"00WWWWW0WWWWWWW0",
-"00WWWWW0RRRWWWW0",
-"000WWWWW0WWWWW00",
-"00000WWWW0WW0000"
+                "0000G0000000G000",
+                "000GGG00000GPG00",
+                "000GPG00000GPG00",
+                "000GPG00000GPG00",
+                "000GPG00000GPG00",
+                "000GPG00000GPG00",
+                "000GPG00000GPG00",
+                "000GPGWW0WWGPG00",
+                "000GPWWW0WWWPG00",
+                "00WWWPBW0WBPWWW0",
+                "00WWPPBW0WBPPWW0",
+                "00WWWWW0WWWWWWW0",
+                "00WWWWW0WWWWWWW0",
+                "00WWWWW0RRRWWWW0",
+                "000WWWWW0WWWWW00",
+                "00000WWWW0WW0000"
             ],
             // 阶段2: 明显裂痕
             [
-"0000G000000GPG00",
-"000GGG00000GPG00",
-"000GPG00000GPG00",
-"000GPG00000GPG00",
-"000GPG00000GPG00",
-"000GPG00000GPG00",
-"000GPG000WWGPG00",
-"000GPGWW0WWWPG00",
-"000GPWWW0WBPWWW0",
-"00WWWPBW000PPWW0",
-"00WWPPBW00000WW0",
-"00WWWWW000000WW0",
-"00WWWWW00WWW00W0",
-"00WWWWW00WWWW000",
-"000WWWWW00RRRW00",
-"00000WWWW0WWWWW0"
+                "0000G000000GPG00",
+                "000GGG00000GPG00",
+                "000GPG00000GPG00",
+                "000GPG00000GPG00",
+                "000GPG00000GPG00",
+                "000GPG00000GPG00",
+                "000GPG000WWGPG00",
+                "000GPGWW0WWWPG00",
+                "000GPWWW0WBPWWW0",
+                "00WWWPBW000PPWW0",
+                "00WWPPBW00000WW0",
+                "00WWWWW000000WW0",
+                "00WWWWW00WWW00W0",
+                "00WWWWW00WWWW000",
+                "000WWWWW00RRRW00",
+                "00000WWWW0WWWWW0"
             ],
             // 阶段3: 严重开裂
             [
-"00G00000000GPG00",
-"0GPG0000000GPG00",
-"0GPG0000000GPG00",
-"0GPG0000000GPG00",
-"0GP00000000GPG00",
-"0G000000000GPG00",
-"00000G000WWGPG00",
-"0000PGWW0WWWPG00",
-"000GPWWW0WBPWWW0",
-"00WWWPBW000PPWW0",
-"00WWPPBW00000WW0",
-"W00WWWW000000WW0",
-"WW00WWW00WWW00W0",
-"W00WWWW00WWWW000",
-"000WWWWW00RRRW00",
-"00000WWWW0WWWWW0"
+                "00G00000000GPG00",
+                "0GPG0000000GPG00",
+                "0GPG0000000GPG00",
+                "0GPG0000000GPG00",
+                "0GP00000000GPG00",
+                "0G000000000GPG00",
+                "00000G000WWGPG00",
+                "0000PGWW0WWWPG00",
+                "000GPWWW0WBPWWW0",
+                "00WWWPBW000PPWW0",
+                "00WWPPBW00000WW0",
+                "W00WWWW000000WW0",
+                "WW00WWW00WWW00W0",
+                "W00WWWW00WWWW000",
+                "000WWWWW00RRRW00",
+                "00000WWWW0WWWWW0"
             ],
             // 阶段4: 几乎破碎
             [
-"00G00000000G0G00",
-"0GPG0000000GPG00",
-"00PG0000000GPG00",
-"0GP00000000G0G00",
-"0GP00000000GPG00",
-"0G000000000GPG00",
-"00000G000WW0PG00",
-"0000PGWW0WWWPG00",
-"000G0WWW0WBPW0W0",
-"00WW0P0W000PPWW0",
-"00WWPP0W00000WW0",
-"W00WW0W000000WW0",
-"W000WW000W0W00W0",
-"W00WW0W00WWWW000",
-"000W00WW00R0RW00",
-"00000WW0W0WWW0W0"
+                "00G00000000G0G00",
+                "0GPG0000000GPG00",
+                "00PG0000000GPG00",
+                "0GP00000000G0G00",
+                "0GP00000000GPG00",
+                "0G000000000GPG00",
+                "00000G000WW0PG00",
+                "0000PGWW0WWWPG00",
+                "000G0WWW0WBPW0W0",
+                "00WW0P0W000PPWW0",
+                "00WWPP0W00000WW0",
+                "W00WW0W000000WW0",
+                "W000WW000W0W00W0",
+                "W00WW0W00WWWW000",
+                "000W00WW00R0RW00",
+                "00000WW0W0WWW0W0"
             ],
             // 阶段5: 完全破碎
             [
-"0000000000000G00",
-"0G0000000000P000",
-"00P0000000000G00",
-"0000000000000000",
-"00P00000000G0G00",
-"0G00000000000G00",
-"000000000W00PG00",
-"0000P0W000WW0G00",
-"000000000W0P00W0",
-"00WW0P00000PPWW0",
-"00W0P00W00000WW0",
-"0000W0W0000000W0",
-"W000W0000W0000W0",
-"000WW0000WW0W000",
-"000W00W00000RW00",
-"00000WW0W0WWW0W0"
+                "0000000000000G00",
+                "0G0000000000P000",
+                "00P0000000000G00",
+                "0000000000000000",
+                "00P00000000G0G00",
+                "0G00000000000G00",
+                "000000000W00PG00",
+                "0000P0W000WW0G00",
+                "000000000W0P00W0",
+                "00WW0P00000PPWW0",
+                "00W0P00W00000WW0",
+                "0000W0W0000000W0",
+                "W000W0000W0000W0",
+                "000WW0000WW0W000",
+                "000W00W00000RW00",
+                "00000WW0W0WWW0W0"
             ]
         ];
 
-        // 初始化游戏
         document.addEventListener('DOMContentLoaded', function() {
             const dialogSection = document.getElementById('dialog-section');
             const dialogText = document.getElementById('current-dialog');
@@ -460,9 +669,23 @@
                 // 渲染对应的裂开阶段
                 renderPixelCharacter(gameData.crackLevel);
                 
+                // 应用特效
+                applyEffect(currentDialog.effect);
+                
                 // 如果处于裂开阶段，添加震动效果
                 if (gameData.crackLevel > 0 && gameData.crackLevel < 5) {
                     addShakeEffect();
+                }
+            }
+            
+            // 应用特效
+            function applyEffect(effectType) {
+                // 移除所有特效类
+                pixelGrid.classList.remove('shake', 'glitch', 'flicker', 'distort', 'jitter', 'pulse');
+                
+                // 添加新的特效类
+                if (effectType) {
+                    pixelGrid.classList.add(effectType);
                 }
             }
             
@@ -472,7 +695,7 @@
                 pixelGrid.innerHTML = '';
                 
                 // 获取对应裂开阶段的像素数据
-                const pixelData = rabbitCrackStages[crackLevel] || rabbitNormal;
+                const pixelData = rabbitCrackStages[crackLevel] || rabbitCrackStages[0];
                 
                 // 创建像素
                 pixelData.forEach((row, rowIndex) => {
@@ -489,7 +712,7 @@
                             pixel.style.border = '1px solid rgba(0,0,0,0.2)';
                             
                             // 标记裂纹像素
-                            if (colorCode === 'G' || colorCode === 'X') {
+                            if (colorCode === 'G') {
                                 pixel.classList.add('cracked');
                             }
                             

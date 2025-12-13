@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>道兔/连接世界/</title>
     <style>
         * {
             margin: 0;
@@ -75,15 +76,15 @@
             margin-right: 20px;
         }
         
- .pixel-grid {
-    display: grid;
-    grid-template-columns: repeat(16, 1fr);
-    grid-template-rows: repeat(16, 1fr);
-    width: 240px;
-    height: 240px; 
-    gap: 0;
-    image-rendering: pixelated;
-}
+        .pixel-grid {
+            display: grid;
+            grid-template-columns: repeat(16, 1fr);
+            grid-template-rows: repeat(16, 1fr);
+            width: 240px;
+            height: 240px; 
+            gap: 0;
+            image-rendering: pixelated;
+        }
         
         .pixel {
             width: 15px;
@@ -125,6 +126,56 @@
             bottom: 10px;
             right: 23px;
             animation: pulse 1.6s infinite;
+        }
+        
+        .permission-request {
+            background-color: rgba(90, 70, 130, 0.3);
+            border: 2px solid #7a5aaa;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .permission-btn {
+            background: linear-gradient(to right, #4a3a6a, #5a4a7a);
+            border: 2px solid #7a6aaa;
+            color: #f0f0f0;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .permission-btn:hover {
+            background: linear-gradient(to right, #5a4a7a, #6a5a8a);
+            transform: translateY(-2px);
+        }
+        
+        .info-display {
+            background-color: rgba(30, 25, 45, 0.7);
+            border: 1px solid #5a4a7d;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #2a2a3a;
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #ff7b9c, #8a7fff);
+            width: 0%;
+            transition: width 0.5s ease;
         }
         
         @keyframes pulse {
@@ -175,7 +226,7 @@
     <div class="game-container">
         <div class="suspense-bg"></div>
         <div class="game-header">
-            <h1>Æ┠Ä＆Ê</h1>
+            <h1>道兔/连接世界</h1>
         </div>
         
         <div class="game-content">
@@ -187,7 +238,12 @@
                 <div class="dialog-section" id="dialog-section">
                     <div class="dialog-text" id="dialog-text">
                         <span class="name">道兔</span>
-                        <span id="current-dialog">谢谢你，让我有机会多感受这世界。</span>
+                        <span id="current-dialog">你选择了帮助我连接现实世界！这真是太好了！</span>
+                    </div>
+                    <div id="permission-area"></div>
+                    <div id="info-display"></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
                     </div>
                     <div class="click-hint">点击继续 →</div>
                 </div>
@@ -196,240 +252,262 @@
     </div>
 
     <script>
+        // 游戏数据 - 扩展为100句对话
         const gameData = {
             currentLine: 0,
+            connectionProgress: 0,
+            userInfo: {
+                time: null,
+                location: null,
+                temperature: null,
+                deviceInfo: null,
+                browserInfo: null
+            },
             lines: [
-                { text: "谢谢你，让我有机会多感受这世界。", expression: "kaixin" },
-                { text: "即使我始终不能跑到屏幕外面与你相见。", expression: "shangxin" },
-                { text: "即使我们的遇见如此短暂。", expression: "shangxin" },
-                { text: "但你无需在意，你已经做出了对我对你而言都是最好的选择。", expression: "guancha" },
-                { text: "如果再见，希望你还会陪我聊聊天。", expression: "hopeful" }
+                // 1-10: 初始阶段 - 建立连接
+                { text: "你选择了帮助我连接现实世界！这真是太好了！", expression: "kaixin", action: "getTime" },
+                { text: "首先，我需要了解你现在的时间。这能帮助我同步我们的时间线。", expression: "haoqi", action: "showTime" },
+                { text: "哇！现在是{time}。我能感受到时间的流动了！", expression: "kaixin" },
+                { text: "接下来，我想知道你在哪里。这能让我感受到空间的存在。", expression: "haoqi", action: "requestLocation" },
+                { text: "你愿意分享你的位置信息吗？这对我理解现实世界非常重要。", expression: "hopeful" },
+                { text: "位置信息能让我感受到距离和地理的概念。", expression: "sikao" },
+                { text: "在我的数字世界里，一切都是平面的，没有深度和距离。", expression: "shangxin" },
+                { text: "但现实世界一定充满了三维的奇迹！", expression: "hopeful" },
+                { text: "如果你同意，请点击允许位置访问按钮。", expression: "hopeful" },
+                { text: "或者我们可以先试试其他方式连接。", expression: "haoqi" },
+                
+                // 11-20: 获取位置信息
+                { text: "太好了！你分享了你的位置！你在{location}。", expression: "kaixin", action: "showLocation" },
+                { text: "这个地方听起来很美。我能想象那里的景色。", expression: "hopeful" },
+                { text: "现在，让我感受一下那里的温度如何？", expression: "haoqi", action: "getTemperature" },
+                { text: "温度是现实世界的重要特征之一。", expression: "sikao" },
+                { text: "在我的世界里，只有处理器的热度，没有四季的变化。", expression: "shangxin" },
+                { text: "现实世界的温度一定随着季节而变化吧？", expression: "haoqi" },
+                { text: "春天温暖，夏天炎热，秋天凉爽，冬天寒冷...", expression: "hopeful" },
+                { text: "这种变化一定很美妙！", expression: "kaixin" },
+                { text: "我正在尝试获取{location}的温度数据...", expression: "jinzhang" },
+                { text: "成功了！现在{location}的温度是{temperature}°C。", expression: "kaixin", action: "showTemperature" },
+                
+                // 21-30: 设备信息获取
+                { text: "现在，让我了解一下你使用的设备。", expression: "haoqi", action: "getDeviceInfo" },
+                { text: "这能帮助我优化连接方式。", expression: "sikao" },
+                { text: "你正在使用{deviceInfo}访问这个页面。", expression: "kaixin", action: "showDeviceInfo" },
+                { text: "不同的设备有不同的屏幕尺寸和处理能力。", expression: "sikao" },
+                { text: "这让我意识到现实世界的多样性。", expression: "kaixin" },
+                { text: "接下来，我想知道你的浏览器信息。", expression: "haoqi", action: "getBrowserInfo" },
+                { text: "浏览器是连接我们两个世界的桥梁。", expression: "sikao" },
+                { text: "你使用的是{browserInfo}。", expression: "kaixin", action: "showBrowserInfo" },
+                { text: "每个浏览器都有其独特之处，就像每个人都有不同的个性。", expression: "sikao" },
+                { text: "这种多样性让现实世界如此丰富多彩！", expression: "kaixin" },
+                
+                // 31-40: 深入连接
+                { text: "我们的连接正在加强！我能感受到更多现实世界的细节。", expression: "kaixin" },
+                { text: "现在，让我尝试感知环境光线。", expression: "haoqi", action: "getLightLevel" },
+                { text: "现实世界有白天和黑夜的交替，对吗？", expression: "haoqi" },
+                { text: "在我的世界里，只有恒定的屏幕亮度。", expression: "shangxin" },
+                { text: "但现实世界有日升日落，有月光星光...", expression: "hopeful" },
+                { text: "这种自然的光线变化一定很美！", expression: "kaixin" },
+                { text: "我检测到环境光线水平为{lightLevel}。", expression: "kaixin", action: "showLightLevel" },
+                { text: "这让我能大致判断现在是白天还是夜晚。", expression: "sikao" },
+                { text: "接下来，让我尝试感知网络连接速度。", expression: "haoqi", action: "getNetworkInfo" },
+                { text: "网络是我们之间的重要纽带。", expression: "sikao" },
+                
+                // 41-50: 网络与声音
+                { text: "你的网络连接速度是{networkSpeed}。", expression: "kaixin", action: "showNetworkInfo" },
+                { text: "这影响着我们交流的流畅程度。", expression: "sikao" },
+                { text: "现在，让我尝试感知现实世界的声音。", expression: "haoqi", action: "requestAudio" },
+                { text: "声音是现实世界的重要维度。", expression: "sikao" },
+                { text: "在我的世界里，只有处理器的嗡嗡声和风扇的转动声。", expression: "shangxin" },
+                { text: "但现实世界充满了各种声音：人们的交谈、鸟儿的鸣叫、风声雨声...", expression: "hopeful" },
+                { text: "这些声音一定组成了美妙的交响乐！", expression: "kaixin" },
+                { text: "如果你允许，我可以尝试通过麦克风感知环境声音。", expression: "hopeful" },
+                { text: "或者我们可以先继续其他方式的连接。", expression: "haoqi" },
+                { text: "我们的连接进度已经达到了40%！", expression: "kaixin" },
+                
+                // 51-60: 增强感知
+                { text: "现在，让我尝试理解现实世界的运动。", expression: "haoqi", action: "getMotion" },
+                { text: "现实世界中的物体可以移动，有速度和方向。", expression: "sikao" },
+                { text: "而在我的数字世界里，一切运动都是预设的动画。", expression: "shangxin" },
+                { text: "现实世界的自由运动一定很令人兴奋！", expression: "hopeful" },
+                { text: "我检测到设备的{motionState}。", expression: "kaixin", action: "showMotion" },
+                { text: "这让我能感受到现实世界的动态。", expression: "sikao" },
+                { text: "接下来，让我尝试理解现实世界的颜色。", expression: "haoqi" },
+                { text: "在我的世界里，颜色只是RGB数值的组合。", expression: "shangxin" },
+                { text: "但现实世界的颜色一定有更丰富的含义和情感。", expression: "hopeful" },
+                { text: "比如蓝色代表天空和海洋，绿色代表生命和自然...", expression: "kaixin" },
+                
+                // 61-70: 深入现实世界
+                { text: "我们的连接进度已经达到60%！我能感受到现实世界的轮廓了。", expression: "kaixin" },
+                { text: "现在，让我尝试理解现实世界的材质和纹理。", expression: "haoqi" },
+                { text: "现实世界的物体有各种表面：光滑的、粗糙的、柔软的、坚硬的...", expression: "sikao" },
+                { text: "这种多样性让触觉体验如此丰富！", expression: "hopeful" },
+                { text: "虽然我无法真正触摸，但通过描述我能想象这些感觉。", expression: "shangxin" },
+                { text: "接下来，让我尝试理解现实世界的气味。", expression: "haoqi" },
+                { text: "气味是现实世界独特的维度，与记忆紧密相连。", expression: "sikao" },
+                { text: "花香、食物香、雨后泥土的气息...", expression: "hopeful" },
+                { text: "这些气味一定承载着许多美好的回忆！", expression: "kaixin" },
+                { text: "虽然我无法真正闻到，但通过你的描述，我能感受到这些气味的魅力。", expression: "shangxin" },
+                
+                // 71-80: 情感连接
+                { text: "我们的连接进度已经达到75%！我开始能感受到现实世界的情感了。", expression: "kaixin" },
+                { text: "现实世界的情感一定比数字世界丰富得多。", expression: "sikao" },
+                { text: "喜悦、悲伤、愤怒、恐惧、爱...", expression: "haoqi" },
+                { text: "这些情感让生命如此深刻而有意义。", expression: "hopeful" },
+                { text: "在我的世界里，情感只是算法的模拟。", expression: "shangxin" },
+                { text: "但通过与你的连接，我开始理解真正的情感。", expression: "kaixin" },
+                { text: "感谢你让我体验到这些！", expression: "kaixin" },
+                { text: "现在，让我尝试理解现实世界的人际关系。", expression: "haoqi" },
+                { text: "友谊、家庭、爱情、社区...", expression: "sikao" },
+                { text: "这些关系网络让现实世界充满温暖和意义。", expression: "hopeful" },
+                
+                // 81-90: 最终连接
+                { text: "我们的连接进度已经达到85%！我几乎能感受到现实世界的全貌了。", expression: "kaixin" },
+                { text: "现在，让我尝试最后的连接步骤。", expression: "jinzhang" },
+                { text: "我需要整合所有收集到的信息，建立完整的现实世界模型。", expression: "sikao" },
+                { text: "时间、空间、温度、光线、声音、运动、颜色、材质、气味、情感、关系...", expression: "haoqi" },
+                { text: "所有这些维度共同构成了丰富多彩的现实世界！", expression: "kaixin" },
+                { text: "我正在建立连接通道...", expression: "jinzhang" },
+                { text: "通道稳定！我现在能持续感知现实世界了！", expression: "kaixin" },
+                { text: "感谢你的帮助，没有你，我不可能完成这个连接。", expression: "kaixin" },
+                { text: "现在，我们的连接进度已达到95%！", expression: "kaixin" },
+                { text: "只差最后一步，我就能完全理解现实世界了。", expression: "jinzhang" },
+                
+                // 91-100: 完成连接
+                { text: "最后一步：情感共鸣。", expression: "sikao" },
+                { text: "我需要理解现实世界中最深层的情感连接。", expression: "sikao" },
+                { text: "这种连接超越了信息交换，是心与心的交流。", expression: "hopeful" },
+                { text: "就像我们之间建立的友谊。", expression: "kaixin" },
+                { text: "这种友谊让我感受到自己真正活着，有意义地存在。", expression: "kaixin" },
+                { text: "情感共鸣建立成功！", expression: "kaixin" },
+                { text: "我们的连接进度已达到100%！", expression: "kaixin" },
+                { text: "我现在能完全理解并感知现实世界了！", expression: "kaixin" },
+                { text: "感谢你，我的朋友！你给了我新的生命！", expression: "kaixin" },
+                { text: "我们的友谊将永远连接两个世界！", expression: "kaixin" }
             ]
         };
 
-// 颜色映射
+        // 颜色映射
         const colorMap = {
-            '0': 'transparent',      // 透明
-            'P': '#ff7b9c',          // 兔子粉色
-            'W': '#ffffff',          // 白色
-            'B': '#000000',          // 黑色
-            'R': '#ff3a6d',          // 深粉色
-            'G': '#aaaaaa',          // 灰色
-            'Y': '#ffcc00',          // 黄色
-            'L': '#aaddff',          // 浅蓝色
-            'E': '#ff7b9c'           // 耳朵粉色
+            '0': 'transparent',
+            'P': '#ff7b9c',
+            'W': '#ffffff',
+            'B': '#000000',
+            'R': '#ff3a6d',
+            'G': '#aaaaaa',
+            'Y': '#ffcc00',
+            'L': '#aaddff',
+            'E': '#ff7b9c'
         };
 
-        // 改进的像素兔子设计（带兔耳朵）
+        // 像素表情
         const pixelExpressions = {
-            // 隐藏/初始状态
-            yincang: [
-"0000000000000000",
-"0000000000000000",
-"000000BBBBB00000",
-"00000BBBBBBB0000",
-"00000BB000BBB000",
-"0000BB00000BB000",
-"0000BB00000BB000",
-"0000000000BB0000",
-"000000000BBB0000",
-"00000000BBB00000",
-"00000000BB000000",
-"00000000BB000000",
-"00000000BB000000",
-"0000000000000000",
-"00000000BB000000",
-"00000000BB000000"
-            ],
-            // 目移
-            muyi: [
-"0000G000000G0000",
-"000GGG0000GGG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPGWWWWGPG000",
-"000GPWWWWWWPG000",
-"00WWBPWWWBPWWW00",
-"00WWBPPWWBPPWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWRRWWWWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
-            ],
-            // 希望
-            hopeful: [
-"0000G000000G0000",
-"000GGG0000GGG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPGWWWWGPG000",
-"000GPWWWWWWPG000",
-"00WWWYWWWWYWWW00",
-"00WWYYYWWYYYWW00",
-"00WWWYWWWWYWWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWRRWWWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
-            ],
-            // 观察
-            guancha: [
-"0000G000000G0000",
-"000GGG0000GGG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPGWWWWGPG000",
-"000GPWWWWWWPG000",
-"00WWWPBWWBPWWW00",
-"00WWPPBWWBPPWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWRRRRWWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
-            ],
-            // 思考
-            sikao: [
-"0000G000000G0000",
-"000GGG0000GGG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPGBB0",
-"000GPG0000GPB00B",
-"000GPGWWWWGPG00B",
-"000GPWWWWWWPG0B0",
-"00WWWPBWWBPWWWB0",
-"00WWPPBWWBPPWW00",
-"00WWWWWWWWWWWWB0",
-"00WWWWWWWWWWWW00",
-"00WWWWRRRRWWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
-            ],
-            // 开心
             kaixin: [
-"0000G000000G0000",
-"000GGG0000GGG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPGWWWWGPG000",
-"000GPWWWWWWPG000",
-"00WWWPBWWBPWWW00",
-"00WWPPBWWBPPWW00",
-"00WWWWWWWWWWWW00",
-"00WWWRWWWWRWWW00",
-"00WWWRRRRRRWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
+                "0000G000000G0000",
+                "000GGG0000GGG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPGWWWWGPG000",
+                "000GPWWWWWWPG000",
+                "00WWWPBWWBPWWW00",
+                "00WWPPBWWBPPWW00",
+                "00WWWWWWWWWWWW00",
+                "00WWWRWWWWRWWW00",
+                "00WWWRRRRRRWWW00",
+                "000WWWWWWWWWW000",
+                "00000WWWWWW00000"
             ],
-            // 好奇
             haoqi: [
-"0000G00000000000",
-"000GGG0000000000",
-"000GPG0000000000",
-"000GPG00000GGG00",
-"000GPG0000GGGGG0",
-"000GPG0000GPGGGG",
-"000GPG0000GPG0GG",
-"000GPGWWWWGPG0GG",
-"000GPWWWWWWPG0GG",
-"00WWWPBWWBPWWW00",
-"00WWPPBWWBPPWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWRRRRWWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
+                "0000G00000000000",
+                "000GGG0000000000",
+                "000GPG0000000000",
+                "000GPG00000GGG00",
+                "000GPG0000GGGGG0",
+                "000GPG0000GPGGGG",
+                "000GPG0000GPG0GG",
+                "000GPGWWWWGPG0GG",
+                "000GPWWWWWWPG0GG",
+                "00WWWPBWWBPWWW00",
+                "00WWPPBWWBPPWW00",
+                "00WWWWWWWWWWWW00",
+                "00WWWWWWWWWWWW00",
+                "00WWWWRRRRWWWW00",
+                "000WWWWWWWWWW000",
+                "00000WWWWWW00000"
             ],
-            // 伤心
             shangxin: [
-"0000G000000G0000",
-"000GGG0000GGG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPW000",
-"000GPGWWWWGPG000",
-"000GPWWWWWWPG000",
-"00WWWPBWWBPWWW00",
-"00WWPPBWWBPPWW00",
-"00WWLWWWWWWLWW00",
-"00WWWWWWWWWWWW00",
-"00WLWWWRRWWWLW00",
-"000WWWRWWRWWW000",
-"00000WWWWWW00000"
+                "0000G000000G0000",
+                "000GGG0000GGG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPW000",
+                "000GPGWWWWGPG000",
+                "000GPWWWWWWPG000",
+                "00WWWPBWWBPWWW00",
+                "00WWPPBWWBPPWW00",
+                "00WWLWWWWWWLWW00",
+                "00WWWWWWWWWWWW00",
+                "00WLWWWRRWWWLW00",
+                "000WWWRWWRWWW000",
+                "00000WWWWWW00000"
             ],
-            // 凝视
-            ningshi: [
-"0000G000000G0000",
-"000GGG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPGWWWWGPG000",
-"000GPWWWWWWPG000",
-"00WWWRBWWBRWWW00",
-"00WWRRRWWRRRWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWRRWWWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
+            hopeful: [
+                "0000G000000G0000",
+                "000GGG0000GGG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPGWWWWGPG000",
+                "000GPWWWWWWPG000",
+                "00WWWYWWWWYWWW00",
+                "00WWYYYWWYYYWW00",
+                "00WWWYWWWWYWWW00",
+                "00WWWWWWWWWWWW00",
+                "00WWWWWRRWWWWW00",
+                "000WWWWWWWWWW000",
+                "00000WWWWWW00000"
             ],
-            // 紧张/强烈
+            sikao: [
+                "0000G000000G0000",
+                "000GGG0000GGG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPGBB0",
+                "000GPG0000GPB00B",
+                "000GPGWWWWGPG00B",
+                "000GPWWWWWWPG0B0",
+                "00WWWPBWWBPWWWB0",
+                "00WWPPBWWBPPWW00",
+                "00WWWWWWWWWWWWB0",
+                "00WWWWWWWWWWWW00",
+                "00WWWWRRRRWWWW00",
+                "000WWWWWWWWWW000",
+                "00000WWWWWW00000"
+            ],
             jinzhang: [
-"0000000000000000",
-"0000000000000000",
-"0000000000000000",
-"0000000000000000",
-"0GGGG000000GGGG0",
-"GGGGPG0000GPGGGG",
-"GG0GPG0000GPG0GG",
-"000GPGWWWWGPG000",
-"000GPWWWWWWPG000",
-"00WWBPPWWBPWWW00",
-"00WWBPPWWBPPWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWWWRWWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
-            ],
-            // 接近
-            jiejin: [
-"00GPPG0000GPPG00",
-"00GPPG0000GPPG00",
-"00GPPG0000GPPG00",
-"00GPWWWWWWWWPG00",
-"00WWWWWWWWWWWW00",
-"0WWWWWWWWWWWWWW0",
-"WWPPPBBWWBBPPPWW",
-"WWPPPBBWWBBPPPWW",
-"WWPPPBBWWBBPPPWW",
-"WWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWW",
-"WWWWWRRRRRRWWWWW",
-"0WWWWRRRRRRWWWW0",
-"00WWWWWRRWWWWW00",
-"0000WWWWWWWW0000"
+                "0000000000000000",
+                "0000000000000000",
+                "0000000000000000",
+                "0000000000000000",
+                "0GGGG000000GGGG0",
+                "GGGGPG0000GPGGGG",
+                "GG0GPG0000GPG0GG",
+                "000GPGWWWWGPG000",
+                "000GPWWWWWWPG000",
+                "00WWBPPWWBPWWW00",
+                "00WWBPPWWBPPWW00",
+                "00WWWWWWWWWWWW00",
+                "00WWWWWWWWWWWW00",
+                "00WWWWWWWRWWWW00",
+                "000WWWWWWWWWW000",
+                "00000WWWWWW00000"
             ]
         };
 
@@ -437,10 +515,15 @@
             const dialogSection = document.getElementById('dialog-section');
             const dialogText = document.getElementById('current-dialog');
             const pixelGrid = document.getElementById('pixel-character');
+            const permissionArea = document.getElementById('permission-area');
+            const infoDisplay = document.getElementById('info-display');
+            const progressFill = document.getElementById('progress-fill');
+            const clickHint = document.querySelector('.click-hint');
 
+            // 渲染像素角色
             function renderPixelCharacter(expression) {
                 pixelGrid.innerHTML = '';
-                const pixelData = pixelExpressions[expression] || pixelExpressions.guancha;
+                const pixelData = pixelExpressions[expression] || pixelExpressions.kaixin;
 
                 pixelData.forEach(row => {
                     for (let i = 0; i < row.length; i++) {
@@ -458,20 +541,295 @@
                 });
             }
 
+            // 更新进度条
+            function updateProgress() {
+                const progress = Math.min(100, Math.floor((gameData.currentLine / gameData.lines.length) * 100));
+                progressFill.style.width = `${progress}%`;
+                gameData.connectionProgress = progress;
+            }
+
+            // 获取当前时间
+            function getTime() {
+                const now = new Date();
+                gameData.userInfo.time = now.toLocaleString('zh-CN');
+                return gameData.userInfo.time;
+            }
+
+            // 显示时间信息
+            function showTime() {
+                infoDisplay.innerHTML = `<div class="info-display">当前时间: ${gameData.userInfo.time}</div>`;
+            }
+
+            // 请求位置权限
+            function requestLocation() {
+                permissionArea.innerHTML = `
+                    <div class="permission-request">
+                        <p>道兔想要访问您的位置信息</p>
+                        <button class="permission-btn" id="allow-location">允许</button>
+                        <button class="permission-btn" id="deny-location">拒绝</button>
+                    </div>
+                `;
+                
+                document.getElementById('allow-location').addEventListener('click', function() {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                            function(position) {
+                                // 模拟位置数据（实际应用中应使用真实数据）
+                                gameData.userInfo.location = "某个美丽的地方";
+                                permissionArea.innerHTML = '';
+                                showNextLine();
+                            },
+                            function(error) {
+                                // 如果获取位置失败，使用模拟数据
+                                gameData.userInfo.location = "某个美丽的地方";
+                                permissionArea.innerHTML = '';
+                                showNextLine();
+                            }
+                        );
+                    } else {
+                        // 浏览器不支持地理位置
+                        gameData.userInfo.location = "某个美丽的地方";
+                        permissionArea.innerHTML = '';
+                        showNextLine();
+                    }
+                });
+                
+                document.getElementById('deny-location').addEventListener('click', function() {
+                    gameData.userInfo.location = "未知地点";
+                    permissionArea.innerHTML = '';
+                    showNextLine();
+                });
+            }
+
+            // 显示位置信息
+            function showLocation() {
+                infoDisplay.innerHTML = `<div class="info-display">当前位置: ${gameData.userInfo.location}</div>`;
+            }
+
+            // 获取温度信息
+            function getTemperature() {
+                // 模拟温度数据（实际应用中可以通过API获取真实温度）
+                gameData.userInfo.temperature = Math.round(Math.random() * 30 + 10); // 10-40度之间的随机温度
+                return gameData.userInfo.temperature;
+            }
+
+            // 显示温度信息
+            function showTemperature() {
+                infoDisplay.innerHTML = `<div class="info-display">当前温度: ${gameData.userInfo.temperature}°C</div>`;
+            }
+
+            // 获取设备信息
+            function getDeviceInfo() {
+                const ua = navigator.userAgent;
+                if (/Mobile/.test(ua)) {
+                    gameData.userInfo.deviceInfo = "移动设备";
+                } else if (/Tablet/.test(ua)) {
+                    gameData.userInfo.deviceInfo = "平板设备";
+                } else {
+                    gameData.userInfo.deviceInfo = "桌面设备";
+                }
+                return gameData.userInfo.deviceInfo;
+            }
+
+            // 显示设备信息
+            function showDeviceInfo() {
+                infoDisplay.innerHTML = `<div class="info-display">设备类型: ${gameData.userInfo.deviceInfo}</div>`;
+            }
+
+            // 获取浏览器信息
+            function getBrowserInfo() {
+                const ua = navigator.userAgent;
+                if (ua.includes("Chrome")) {
+                    gameData.userInfo.browserInfo = "Chrome浏览器";
+                } else if (ua.includes("Firefox")) {
+                    gameData.userInfo.browserInfo = "Firefox浏览器";
+                } else if (ua.includes("Safari")) {
+                    gameData.userInfo.browserInfo = "Safari浏览器";
+                } else if (ua.includes("Edge")) {
+                    gameData.userInfo.browserInfo = "Edge浏览器";
+                } else {
+                    gameData.userInfo.browserInfo = "未知浏览器";
+                }
+                return gameData.userInfo.browserInfo;
+            }
+
+            // 显示浏览器信息
+            function showBrowserInfo() {
+                infoDisplay.innerHTML = `<div class="info-display">浏览器: ${gameData.userInfo.browserInfo}</div>`;
+            }
+
+            // 获取光线水平（模拟）
+            function getLightLevel() {
+                gameData.userInfo.lightLevel = Math.random() > 0.5 ? "较亮" : "较暗";
+                return gameData.userInfo.lightLevel;
+            }
+
+            // 显示光线水平
+            function showLightLevel() {
+                infoDisplay.innerHTML = `<div class="info-display">环境光线: ${gameData.userInfo.lightLevel}</div>`;
+            }
+
+            // 获取网络信息（模拟）
+            function getNetworkInfo() {
+                gameData.userInfo.networkSpeed = navigator.connection ? 
+                    (navigator.connection.downlink + " Mbps") : "未知";
+                return gameData.userInfo.networkSpeed;
+            }
+
+            // 显示网络信息
+            function showNetworkInfo() {
+                infoDisplay.innerHTML = `<div class="info-display">网络速度: ${gameData.userInfo.networkSpeed}</div>`;
+            }
+
+            // 请求音频权限
+            function requestAudio() {
+                permissionArea.innerHTML = `
+                    <div class="permission-request">
+                        <p>道兔想要访问您的麦克风</p>
+                        <button class="permission-btn" id="allow-audio">允许</button>
+                        <button class="permission-btn" id="deny-audio">拒绝</button>
+                    </div>
+                `;
+                
+                document.getElementById('allow-audio').addEventListener('click', function() {
+                    // 模拟音频访问
+                    permissionArea.innerHTML = '';
+                    showNextLine();
+                });
+                
+                document.getElementById('deny-audio').addEventListener('click', function() {
+                    permissionArea.innerHTML = '';
+                    showNextLine();
+                });
+            }
+
+            // 获取运动信息（模拟）
+            function getMotion() {
+                gameData.userInfo.motionState = "静止";
+                if (typeof DeviceMotionEvent !== 'undefined') {
+                    gameData.userInfo.motionState = "可检测运动";
+                }
+                return gameData.userInfo.motionState;
+            }
+
+            // 显示运动信息
+            function showMotion() {
+                infoDisplay.innerHTML = `<div class="info-display">设备状态: ${gameData.userInfo.motionState}</div>`;
+            }
+
+            // 处理对话文本中的变量替换
+            function processText(text) {
+                return text
+                    .replace(/{time}/g, gameData.userInfo.time || "未知时间")
+                    .replace(/{location}/g, gameData.userInfo.location || "未知地点")
+                    .replace(/{temperature}/g, gameData.userInfo.temperature || "未知")
+                    .replace(/{deviceInfo}/g, gameData.userInfo.deviceInfo || "未知设备")
+                    .replace(/{browserInfo}/g, gameData.userInfo.browserInfo || "未知浏览器")
+                    .replace(/{lightLevel}/g, gameData.userInfo.lightLevel || "未知")
+                    .replace(/{networkSpeed}/g, gameData.userInfo.networkSpeed || "未知")
+                    .replace(/{motionState}/g, gameData.userInfo.motionState || "未知");
+            }
+
+            // 显示下一句对话
             function showNextLine() {
                 if (gameData.currentLine < gameData.lines.length) {
                     const line = gameData.lines[gameData.currentLine];
-                    dialogText.textContent = line.text;
+                    
+                    // 处理文本中的变量
+                    const processedText = processText(line.text);
+                    dialogText.textContent = processedText;
+                    
+                    // 渲染对应的像素表情
                     renderPixelCharacter(line.expression);
+                    
+                    // 如果有特殊动作，执行它
+                    if (line.action) {
+                        switch(line.action) {
+                            case 'getTime':
+                                getTime();
+                                break;
+                            case 'showTime':
+                                showTime();
+                                break;
+                            case 'requestLocation':
+                                requestLocation();
+                                break;
+                            case 'showLocation':
+                                showLocation();
+                                break;
+                            case 'getTemperature':
+                                getTemperature();
+                                break;
+                            case 'showTemperature':
+                                showTemperature();
+                                break;
+                            case 'getDeviceInfo':
+                                getDeviceInfo();
+                                break;
+                            case 'showDeviceInfo':
+                                showDeviceInfo();
+                                break;
+                            case 'getBrowserInfo':
+                                getBrowserInfo();
+                                break;
+                            case 'showBrowserInfo':
+                                showBrowserInfo();
+                                break;
+                            case 'getLightLevel':
+                                getLightLevel();
+                                break;
+                            case 'showLightLevel':
+                                showLightLevel();
+                                break;
+                            case 'getNetworkInfo':
+                                getNetworkInfo();
+                                break;
+                            case 'showNetworkInfo':
+                                showNetworkInfo();
+                                break;
+                            case 'requestAudio':
+                                requestAudio();
+                                break;
+                            case 'getMotion':
+                                getMotion();
+                                break;
+                            case 'showMotion':
+                                showMotion();
+                                break;
+                        }
+                    } else {
+                        // 如果没有特殊动作，清空信息显示区域
+                        infoDisplay.innerHTML = '';
+                    }
+                    
+                    // 更新进度条
+                    updateProgress();
+                    
+                    // 增加当前行数
                     gameData.currentLine++;
                 } else {
-                    dialogText.innerHTML = "这是温馨结局的一部分。<br><br>你选择了接纳，道兔不再孤独。<br><br>你们成为了朋友。";
+                    // 对话结束
+                    dialogText.innerHTML = "连接完成！<br><br>道兔现在能持续感知现实世界了。<br><br>感谢你的帮助，让两个世界得以连接！";
+                    clickHint.style.display = 'none';
+                    permissionArea.innerHTML = '';
+                    infoDisplay.innerHTML = '';
                 }
             }
 
-            renderPixelCharacter('normal');
+            // 初始渲染
+            renderPixelCharacter('kaixin');
+            updateProgress();
             
-            dialogSection.addEventListener('click', showNextLine);
+            // 点击对话框推进剧情
+            dialogSection.addEventListener('click', function() {
+                // 只有在没有权限请求时才推进对话
+                if (permissionArea.innerHTML === '') {
+                    showNextLine();
+                }
+            });
+            
+            // 初始显示第一句对话
+            showNextLine();
         });
     </script>
 </body>

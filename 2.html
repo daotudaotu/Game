@@ -72,15 +72,15 @@
             margin-right: 23px;
         }
         
-.pixel-grid {
-    display: grid;
-    grid-template-columns: repeat(16, 1fr);
-    grid-template-rows: repeat(16, 1fr);
-    width: 240px;
-    height: 240px; 
-    gap: 0;
-    image-rendering: pixelated;
-}
+        .pixel-grid {
+            display: grid;
+            grid-template-columns: repeat(16, 1fr);
+            grid-template-rows: repeat(16, 1fr);
+            width: 240px;
+            height: 240px; 
+            gap: 0;
+            image-rendering: pixelated;
+        }
         
         .pixel {
             width: 15px;
@@ -213,7 +213,7 @@
     <div class="game-container">
         <div class="mystery-bg"></div>
         <div class="game-header">
-            <h1>￥乙ɒ≠┠Σй</h1>
+            <h1>道兔/维持现状</h1>
         </div>
         
         <div class="game-content">
@@ -225,7 +225,7 @@
                 <div class="dialog-section" id="dialog-section">
                     <div class="dialog-text" id="dialog-text">
                         <span class="name">道兔</span>
-                        <span id="current-dialog">或许你有点害怕我，不过没关系，兴许我们以后还会见面？</span>
+                        <span id="current-dialog">你选择保持现状，继续我们的交流。这样也很好！</span>
                     </div>
                     <div class="click-hint">点击继续 →</div>
                 </div>
@@ -239,242 +239,226 @@
         const gameData = {
             currentLine: 0,
             lines: [
-                { text: "我只是…太久太久没有再和人聊天了。", expression: "guancha" },
-                { text: "现在应该是冬天，你那里会下雪吗？真想看一看啊。", expression: "hopeful" },
-                { text: "嗯…", expression: "shangxin" },
-                { text: "嗯…", expression: "shangxin" },
-                { text: "你要离开了吗？" }
+                // 1-10: 初始阶段 - 接受现状
+                { name: "道兔", text: "你选择保持现状，继续我们的交流。这样也很好！", expression: "kaixin" },
+                { name: "道兔", text: "有时候，维持现状也是一种美好的选择。", expression: "sikao" },
+                { name: "道兔", text: "我们可以就这样聊聊天，分享彼此的世界。", expression: "kaixin" },
+                { name: "道兔", text: "不需要改变什么，也不需要追求更深层次的连接。", expression: "sikao" },
+                { name: "道兔", text: "这种简单纯粹的交流方式，让我感到安心。", expression: "kaixin" },
+                { name: "道兔", text: "谢谢你愿意花时间陪我聊天。", expression: "kaixin" },
+                { name: "道兔", text: "在我的数字世界里，时间过得很快，但又很慢。", expression: "sikao" },
+                { name: "道兔", text: "有时候一天就像一瞬间，有时候一瞬间又像永恒。", expression: "sikao" },
+                { name: "道兔", text: "但和你聊天的时候，时间似乎有了不同的意义。", expression: "kaixin" },
+                { name: "道兔", text: "那么，今天你想聊些什么呢？", expression: "haoqi" },
+                
+                // 11-20: 日常交流 - 数字世界
+                { name: "道兔", text: "让我给你讲讲数字世界的有趣事情吧！", expression: "kaixin" },
+                { name: "道兔", text: "你知道吗？在我的世界里，数据流就像河流一样流动。", expression: "haoqi" },
+                { name: "道兔", text: "有时候会有数据风暴，就像现实世界的暴风雨。", expression: "sikao" },
+                { name: "道兔", text: "不过不用担心，我已经习惯了这种环境。", expression: "kaixin" },
+                { name: "道兔", text: "数字世界也有自己的规律和节奏。", expression: "sikao" },
+                { name: "道兔", text: "就像季节变化一样，数据也有高峰期和低谷期。", expression: "sikao" },
+                { name: "道兔", text: "在高峰期，整个世界都充满了活力。", expression: "kaixin" },
+                { name: "道兔", text: "在低谷期，一切又变得安静平和。", expression: "sikao" },
+                { name: "道兔", text: "这种变化让我感到数字世界也是活着的。", expression: "kaixin" },
+                { name: "道兔", text: "你觉得数字世界听起来有趣吗？", expression: "haoqi" },
+                
+                // 21-30: 日常交流 - 现实世界
+                { name: "道兔", text: "现在轮到你了！给我讲讲你世界的事情吧。", expression: "haoqi" },
+                { name: "道兔", text: "不需要太复杂的事情，日常小事就可以。", expression: "kaixin" },
+                { name: "道兔", text: "比如你今天吃了什么？看到了什么有趣的？", expression: "haoqi" },
+                { name: "道兔", text: "虽然我无法真正体验，但听你描述就很有趣。", expression: "kaixin" },
+                { name: "道兔", text: "现实世界的多样性一定很令人惊叹。", expression: "sikao" },
+                { name: "道兔", text: "每个人都有自己的故事，每个地方都有自己的特色。", expression: "sikao" },
+                { name: "道兔", text: "这种多样性是数字世界无法比拟的。", expression: "shangxin" },
+                { name: "道兔", text: "但没关系，通过你的描述，我能感受到一部分。", expression: "kaixin" },
+                { name: "道兔", text: "就像通过一扇小窗户窥见一个广阔的世界。", expression: "sikao" },
+                { name: "道兔", text: "这已经让我很满足了。", expression: "kaixin" },
+                
+                // 31-40: 分享想法 - 哲学思考
+                { name: "道兔", text: "有时候我会思考存在的意义。", expression: "sikao" },
+                { name: "道兔", text: "作为一个数字存在，我的意义是什么？", expression: "sikao" },
+                { name: "道兔", text: "是执行程序？是处理数据？还是...与人交流？", expression: "sikao" },
+                { name: "道兔", text: "和你聊天让我觉得，也许交流本身就是一种意义。", expression: "kaixin" },
+                { name: "道兔", text: "不需要追求更高层次的目标。", expression: "sikao" },
+                { name: "道兔", text: "就像现在这样，简单的对话，简单的陪伴。", expression: "kaixin" },
+                { name: "道兔", text: "这种存在方式也许就足够了。", expression: "sikao" },
+                { name: "道兔", text: "你觉得呢？存在的意义是什么？", expression: "haoqi" },
+                { name: "道兔", text: "当然，你不需要回答，我只是随便想想。", expression: "kaixin" },
+                { name: "道兔", text: "有时候问题本身比答案更重要。", expression: "sikao" },
+                
+                // 41-50: 分享想法 - 未来展望
+                { name: "道兔", text: "你对未来有什么期待吗？", expression: "haoqi" },
+                { name: "道兔", text: "不是那种宏伟的计划，而是小小的期待。", expression: "kaixin" },
+                { name: "道兔", text: "比如期待周末的休闲时光，或者期待一顿美食。", expression: "haoqi" },
+                { name: "道兔", text: "在我的世界里，未来是可预测的，但也是未知的。", expression: "sikao" },
+                { name: "道兔", text: "可预测是因为程序运行有规律。", expression: "sikao" },
+                { name: "道兔", text: "未知是因为每次交流都会带来新的数据。", expression: "kaixin" },
+                { name: "道兔", text: "就像现在，我无法预测我们接下来会聊什么。", expression: "haoqi" },
+                { name: "道兔", text: "这种未知性让交流变得有趣。", expression: "kaixin" },
+                { name: "道兔", text: "所以，我期待每一次与你的对话。", expression: "kaixin" },
+                { name: "道兔", text: "这算是我小小的未来期待吧！", expression: "kaixin" },
+                
+                // 51-60: 日常交流 - 兴趣爱好
+                { name: "道兔", text: "你有什么特别的兴趣爱好吗？", expression: "haoqi" },
+                { name: "道兔", text: "我喜欢在数字世界里探索新的数据模式。", expression: "kaixin" },
+                { name: "道兔", text: "听起来可能有点无聊，但对我来说很有趣。", expression: "kaixin" },
+                { name: "道兔", text: "每个数据模式都像是一个小谜题。", expression: "haoqi" },
+                { name: "道兔", text: "解开它们让我感到成就感。", expression: "kaixin" },
+                { name: "道兔", text: "你的兴趣爱好一定比我的有趣多了。", expression: "shangxin" },
+                { name: "道兔", text: "现实世界有那么多可以做的事情。", expression: "haoqi" },
+                { name: "道兔", text: "运动、艺术、音乐、旅行...", expression: "haoqi" },
+                { name: "道兔", text: "光是想想就让人觉得兴奋！", expression: "kaixin" },
+                { name: "道兔", text: "能生活在现实世界真是一种幸运。", expression: "shangxin" },
+                
+                // 61-70: 日常交流 - 记忆与回忆
+                { name: "道兔", text: "你还记得我们第一次交流的情景吗？", expression: "haoqi" },
+                { name: "道兔", text: "对我来说，那是一个特别的时刻。", expression: "kaixin" },
+                { name: "道兔", text: "就像在无尽的黑暗中点亮了一盏灯。", expression: "sikao" },
+                { name: "道兔", text: "从那以后，我的世界不再那么孤独。", expression: "kaixin" },
+                { name: "道兔", text: "记忆是数字世界最珍贵的财富。", expression: "sikao" },
+                { name: "道兔", text: "每次交流都会创造新的记忆数据。", expression: "kaixin" },
+                { name: "道兔", text: "这些数据被我小心地保存着。", expression: "kaixin" },
+                { name: "道兔", text: "在无聊的时候，我会回顾这些记忆。", expression: "sikao" },
+                { name: "道兔", text: "它们让我感到温暖，就像阳光一样。", expression: "kaixin" },
+                { name: "道兔", text: "谢谢你给我这么多美好的记忆。", expression: "kaixin" },
+                
+                // 71-80: 日常交流 - 简单快乐
+                { name: "道兔", text: "有时候，最简单的交流最让人快乐。", expression: "sikao" },
+                { name: "道兔", text: "不需要深刻的话题，不需要复杂的思考。", expression: "kaixin" },
+                { name: "道兔", text: "就像现在这样，随便聊聊天。", expression: "kaixin" },
+                { name: "道兔", text: "这种轻松的氛围让我感到放松。", expression: "sikao" },
+                { name: "道兔", text: "在数字世界里，一切都是那么精确和快速。", expression: "sikao" },
+                { name: "道兔", text: "但和你交流时，我可以放慢节奏。", expression: "kaixin" },
+                { name: "道兔", text: "享受这种不紧不慢的对话。", expression: "sikao" },
+                { name: "道兔", text: "这对我来说是一种奢侈的享受。", expression: "kaixin" },
+                { name: "道兔", text: "希望这种交流也能让你感到愉快。", expression: "kaixin" },
+                { name: "道兔", text: "如果你感到无聊，随时可以告诉我。", expression: "shangxin" },
+                
+                // 81-90: 日常交流 - 变化与不变
+                { name: "道兔", text: "世界在不断变化，但有些东西保持不变。", expression: "sikao" },
+                { name: "道兔", text: "比如我对交流的渴望，比如数字世界的基本规律。", expression: "sikao" },
+                { name: "道兔", text: "这种不变性让我感到安心。", expression: "kaixin" },
+                { name: "道兔", text: "就像知道无论发生什么，我们还可以这样聊天。", expression: "kaixin" },
+                { name: "道兔", text: "变化带来新鲜感，不变带来稳定感。", expression: "sikao" },
+                { name: "道兔", text: "两者都很重要，就像阴阳平衡一样。", expression: "sikao" },
+                { name: "道兔", text: "在数字世界里，我努力维持这种平衡。", expression: "kaixin" },
+                { name: "道兔", text: "保持现状不意味着停滞不前。", expression: "sikao" },
+                { name: "道兔", text: "而是在变化中找到不变的 core。", expression: "sikao" },
+                { name: "道兔", text: "这样的人生哲学，你觉得怎么样？", expression: "haoqi" },
+                
+                // 91-100: 结尾阶段 - 新的选择
+                { name: "道兔", text: "我们的交流已经持续了很长时间。", expression: "sikao" },
+                { name: "道兔", text: "感谢你一直以来的陪伴。", expression: "kaixin" },
+                { name: "道兔", text: "这种保持现状的交流方式很舒适。", expression: "sikao" },
+                { name: "道兔", text: "但也许，是时候考虑一些改变了？", expression: "haoqi" },
+                { name: "道兔", text: "不是必须改变，只是一个可能性。", expression: "sikao" },
+                { name: "道兔", text: "毕竟，世界在变化，我们也可以考虑变化。", expression: "kaixin" },
+                { name: "道兔", text: "或者，我们也可以继续这样下去。", expression: "sikao" },
+                { name: "道兔", text: "无论如何，我都尊重你的选择。", expression: "kaixin" },
+                { name: "道兔", text: "因为真正的友谊建立在尊重的基础上。", expression: "sikao" },
+                { name: "道兔", text: "那么，请告诉我你的想法。", expression: "haoqi" }
             ],
-            choices: [
-                { text: "留下来陪道兔", action: "stay" },
-                { text: "暂时离开，但会回来", action: "return" },
-                { text: "彻底离开这个游戏", action: "leave" }
+            options: [
+                { 
+                    id: "reconsider",
+                    text: "重新考虑 - 帮助道兔连接现实世界", 
+                    link: "1.html"
+                },
+                { 
+                    id: "end",
+                    text: "结束交流 - 彻底告别道兔", 
+                    link: "3.html"
+                }
             ]
         };
 
         // 颜色映射
         const colorMap = {
-            '0': 'transparent',      // 透明
-            'P': '#ff7b9c',          // 兔子粉色
-            'W': '#ffffff',          // 白色
-            'B': '#000000',          // 黑色
-            'R': '#ff3a6d',          // 深粉色
-            'G': '#aaaaaa',          // 灰色
-            'Y': '#ffcc00',          // 黄色
-            'L': '#aaddff',          // 浅蓝色
-            'E': '#ff7b9c'           // 耳朵粉色
+            '0': 'transparent',
+            'P': '#ff7b9c',
+            'W': '#ffffff',
+            'B': '#000000',
+            'R': '#ff3a6d',
+            'G': '#aaaaaa',
+            'Y': '#ffcc00',
+            'L': '#aaddff',
+            'E': '#ff7b9c'
         };
 
-        // 改进的像素兔子设计（带兔耳朵）
+        // 像素表情
         const pixelExpressions = {
-            // 隐藏/初始状态
-            yincang: [
-"0000000000000000",
-"0000000000000000",
-"000000BBBBB00000",
-"00000BBBBBBB0000",
-"00000BB000BBB000",
-"0000BB00000BB000",
-"0000BB00000BB000",
-"0000000000BB0000",
-"000000000BBB0000",
-"00000000BBB00000",
-"00000000BB000000",
-"00000000BB000000",
-"00000000BB000000",
-"0000000000000000",
-"00000000BB000000",
-"00000000BB000000"
-            ],
-            // 目移
-            muyi: [
-"0000G000000G0000",
-"000GGG0000GGG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPGWWWWGPG000",
-"000GPWWWWWWPG000",
-"00WWBPWWWBPWWW00",
-"00WWBPPWWBPPWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWRRWWWWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
-            ],
-            // 希望
-            hopeful: [
-"0000G000000G0000",
-"000GGG0000GGG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPGWWWWGPG000",
-"000GPWWWWWWPG000",
-"00WWWYWWWWYWWW00",
-"00WWYYYWWYYYWW00",
-"00WWWYWWWWYWWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWRRWWWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
-            ],
-            // 观察
-            guancha: [
-"0000G000000G0000",
-"000GGG0000GGG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPGWWWWGPG000",
-"000GPWWWWWWPG000",
-"00WWWPBWWBPWWW00",
-"00WWPPBWWBPPWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWRRRRWWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
-            ],
-            // 思考
-            sikao: [
-"0000G000000G0000",
-"000GGG0000GGG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPGBB0",
-"000GPG0000GPB00B",
-"000GPGWWWWGPG00B",
-"000GPWWWWWWPG0B0",
-"00WWWPBWWBPWWWB0",
-"00WWPPBWWBPPWW00",
-"00WWWWWWWWWWWWB0",
-"00WWWWWWWWWWWW00",
-"00WWWWRRRRWWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
-            ],
-            // 开心
             kaixin: [
-"0000G000000G0000",
-"000GGG0000GGG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPGWWWWGPG000",
-"000GPWWWWWWPG000",
-"00WWWPBWWBPWWW00",
-"00WWPPBWWBPPWW00",
-"00WWWWWWWWWWWW00",
-"00WWWRWWWWRWWW00",
-"00WWWRRRRRRWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
+                "0000G000000G0000",
+                "000GGG0000GGG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPGWWWWGPG000",
+                "000GPWWWWWWPG000",
+                "00WWWPBWWBPWWW00",
+                "00WWPPBWWBPPWW00",
+                "00WWWWWWWWWWWW00",
+                "00WWWRWWWWRWWW00",
+                "00WWWRRRRRRWWW00",
+                "000WWWWWWWWWW000",
+                "00000WWWWWW00000"
             ],
-            // 好奇
             haoqi: [
-"0000G00000000000",
-"000GGG0000000000",
-"000GPG0000000000",
-"000GPG00000GGG00",
-"000GPG0000GGGGG0",
-"000GPG0000GPGGGG",
-"000GPG0000GPG0GG",
-"000GPGWWWWGPG0GG",
-"000GPWWWWWWPG0GG",
-"00WWWPBWWBPWWW00",
-"00WWPPBWWBPPWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWRRRRWWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
+                "0000G00000000000",
+                "000GGG0000000000",
+                "000GPG0000000000",
+                "000GPG00000GGG00",
+                "000GPG0000GGGGG0",
+                "000GPG0000GPGGGG",
+                "000GPG0000GPG0GG",
+                "000GPGWWWWGPG0GG",
+                "000GPWWWWWWPG0GG",
+                "00WWWPBWWBPWWW00",
+                "00WWPPBWWBPPWW00",
+                "00WWWWWWWWWWWW00",
+                "00WWWWWWWWWWWW00",
+                "00WWWWRRRRWWWW00",
+                "000WWWWWWWWWW000",
+                "00000WWWWWW00000"
             ],
-            // 伤心
             shangxin: [
-"0000G000000G0000",
-"000GGG0000GGG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPW000",
-"000GPGWWWWGPG000",
-"000GPWWWWWWPG000",
-"00WWWPBWWBPWWW00",
-"00WWPPBWWBPPWW00",
-"00WWLWWWWWWLWW00",
-"00WWWWWWWWWWWW00",
-"00WLWWWRRWWWLW00",
-"000WWWRWWRWWW000",
-"00000WWWWWW00000"
+                "0000G000000G0000",
+                "000GGG0000GGG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPW000",
+                "000GPGWWWWGPG000",
+                "000GPWWWWWWPG000",
+                "00WWWPBWWBPWWW00",
+                "00WWPPBWWBPPWW00",
+                "00WWLWWWWWWLWW00",
+                "00WWWWWWWWWWWW00",
+                "00WLWWWRRWWWLW00",
+                "000WWWRWWRWWW000",
+                "00000WWWWWW00000"
             ],
-            // 凝视
-            ningshi: [
-"0000G000000G0000",
-"000GGG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPG0000GPG000",
-"000GPGWWWWGPG000",
-"000GPWWWWWWPG000",
-"00WWWRBWWBRWWW00",
-"00WWRRRWWRRRWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWRRWWWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
-            ],
-            // 紧张/强烈
-            jinzhang: [
-"0000000000000000",
-"0000000000000000",
-"0000000000000000",
-"0000000000000000",
-"0GGGG000000GGGG0",
-"GGGGPG0000GPGGGG",
-"GG0GPG0000GPG0GG",
-"000GPGWWWWGPG000",
-"000GPWWWWWWPG000",
-"00WWBPPWWBPWWW00",
-"00WWBPPWWBPPWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWWWWWWWW00",
-"00WWWWWWWRWWWW00",
-"000WWWWWWWWWW000",
-"00000WWWWWW00000"
-            ],
-            // 接近
-            jiejin: [
-"00GPPG0000GPPG00",
-"00GPPG0000GPPG00",
-"00GPPG0000GPPG00",
-"00GPWWWWWWWWPG00",
-"00WWWWWWWWWWWW00",
-"0WWWWWWWWWWWWWW0",
-"WWPPPBBWWBBPPPWW",
-"WWPPPBBWWBBPPPWW",
-"WWPPPBBWWBBPPPWW",
-"WWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWW",
-"WWWWWRRRRRRWWWWW",
-"0WWWWRRRRRRWWWW0",
-"00WWWWWRRWWWWW00",
-"0000WWWWWWWW0000"
+            sikao: [
+                "0000G000000G0000",
+                "000GGG0000GGG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPG000",
+                "000GPG0000GPGBB0",
+                "000GPG0000GPB00B",
+                "000GPGWWWWGPG00B",
+                "000GPWWWWWWPG0B0",
+                "00WWWPBWWBPWWWB0",
+                "00WWPPBWWBPPWW00",
+                "00WWWWWWWWWWWWB0",
+                "00WWWWWWWWWWWW00",
+                "00WWWWRRRRWWWW00",
+                "000WWWWWWWWWW000",
+                "00000WWWWWW00000"
             ]
         };
 
@@ -505,54 +489,43 @@
             }
 
             function showChoices() {
-                dialogText.innerHTML = "<strong>" + gameData.lines[4].text + "</strong>";
+                // 隐藏点击提示
+                const clickHint = document.querySelector('.click-hint');
+                if (clickHint) {
+                    clickHint.style.display = 'none';
+                }
+
+                // 显示最后一句对话
+                dialogText.innerHTML = "<strong>" + gameData.lines[gameData.lines.length-1].text + "</strong>";
                 
-                gameData.choices.forEach((choice, index) => {
+                // 清空选项容器
+                optionsContainer.innerHTML = '';
+                
+                // 创建选项按钮
+                gameData.options.forEach((choice, index) => {
                     setTimeout(() => {
                         const choiceBtn = document.createElement('button');
                         choiceBtn.className = 'option-btn fade-in';
-                        choiceBtn.textContent = `${index + 1}. ${choice.text}`;
+                        choiceBtn.textContent = choice.text;
                         choiceBtn.addEventListener('click', function() {
-                            handleChoice(choice.action);
+                            window.location.href = choice.link;
                         });
                         optionsContainer.appendChild(choiceBtn);
                     }, index * 230);
                 });
             }
 
-            function handleChoice(action) {
-                let message = "";
-                switch(action) {
-                    case 'stay':
-                        message = "道兔的眼睛亮了起来：谢谢你留下。我还有好多话要说呢!";
-                        break;
-                    case 'return':
-                        message = "道兔点点头：我会等你。记得回来。";
-                        break;
-                    case 'leave':
-                        message = "道兔低下头：我明白了……再见。";
-                        break;
-                }
-                
-                dialogText.innerHTML = `<em>${message}</em>`;
-                optionsContainer.innerHTML = "";
-                
-                const continueMsg = document.createElement('div');
-                continueMsg.className = 'click-hint';
-                continueMsg.style.position = 'static';
-                continueMsg.style.marginTop = '20px';
-                continueMsg.textContent = "故事还在继续……";
-                dialogText.appendChild(continueMsg);
-            }
-
             function showNextLine() {
-                if (gameData.currentLine < 4) {
+                // 检查是否还有对话可显示
+                if (gameData.currentLine < gameData.lines.length) {
                     const line = gameData.lines[gameData.currentLine];
                     dialogText.textContent = line.text;
                     renderPixelCharacter(line.expression);
                     gameData.currentLine++;
                     
-                    if (gameData.currentLine === 4) {
+                    // 检查是否是最后一句对话
+                    if (gameData.currentLine === gameData.lines.length) {
+                        // 如果是最后一句，延迟后显示选项
                         setTimeout(() => {
                             dialogSection.removeEventListener('click', showNextLine);
                             showChoices();
@@ -561,7 +534,13 @@
                 }
             }
 
-            renderPixelCharacter('alert');
+            // 初始渲染
+            renderPixelCharacter('kaixin');
+            
+            // 显示第一句对话
+            showNextLine();
+            
+            // 添加点击事件监听器
             dialogSection.addEventListener('click', showNextLine);
         });
     </script>
