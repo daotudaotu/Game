@@ -1,1 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>粒子动画</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        #canvas {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas"></div>
 
+    <script>
+        // 获取DOM元素
+        const canvasContainer = document.getElementById('canvas');
+        
+        // 初始化Three.js场景
+        let scene, camera, renderer;
+        let particles, particleSystem;
+        let currentFrame = 0;
+        let lastFrameTime = Date.now();
+        const FRAME_DURATION = 150; // 每帧150ms
+        
+        // 颜色数组 - 丰富的配色方案
+        const backgroundColors = [
+            0x0a0a0a, 0x1a1a2e, 0x16213e, 0x0f3460, 0x2d2424,
+            0x1e5128, 0x2c2c2c, 0x1a0b2e, 0x1b262c, 0x1c0c5b,
+            0x3d0000, 0x0d7377, 0x393e46, 0x522546, 0x1e5f74,
+            0x2d2424, 0x3f3351, 0x2c003e, 0x1a1a1a, 0x0f044c
+        ];
+        
+        const particleColorSchemes = [
+            { W: 0xffffff, R: 0xff6b6b, B: 0x4ecdc4 },
+            { W: 0xff9a76, R: 0xff3d68, B: 0xa3de83 },
+            { W: 0xa3de83, R: 0xff3d68, B: 0x5b7db1 },
+            { W: 0x5b7db1, R: 0xf05454, B: 0x6a2c70 },
+            { W: 0xf8f5f1, R: 0xf05454, B: 0x30475e },
+            { W: 0xffd369, R: 0xf05454, B: 0x5b7db1 },
+            { W: 0xc06c84, R: 0xf67280, B: 0x6c5b7b },
+            { W: 0x355c7d, R: 0xf8b195, B: 0xc06c84 },
+            { W: 0xfff5e4, R: 0xff9494, B: 0x9ad3bc },
+            { W: 0xf6f6f6, R: 0x8785a2, B: 0xffc7c7 },
+            { W: 0xf8ede3, R: 0xbdcdd6, B: 0x8ba2ae },
+            { W: 0xf9f9f9, R: 0xa6d1e6, B: 0x7f5283 },
+            { W: 0xf0e4d7, R: 0xff7171, B: 0x6ddccf },
+            { W: 0xf7f7f7, R: 0x7ecfc0, B: 0xf9a1bc },
+            { W: 0xfff8f3, R: 0x9a86a4, B: 0xb7b0e4 },
+            { W: 0xf5f5f5, R: 0x5d9c76, B: 0xdf7857 },
+            { W: 0xf0f0f0, R: 0x3a6351, B: 0xa26769 },
+            { W: 0xfffafa, R: 0x8ac4d0, B: 0xf4d160 },
+            { W: 0xf8f8ff, R: 0x9d65c9, B: 0x00adb5 },
+            { W: 0xf5f5dc, R: 0x7c73e6, B: 0xc4c1e0 }
+        ];
+        
+        let currentBgIndex = 0;
+        let currentParticleIndex = 0;
+        
+        // 动画帧数据
+        const animationFrames = [
+            // 第1帧数据
+            [
+                "00000000000000000000000000000000",
+                "000000000000000000WW000000000000",
+                "000000000000000000WWW00000000000",
+                "0000000000000000WW00WW0000000000",
+                "0000000000000000WWW00WWW00000000",
+                "00000000000000000WWW00WWW0000000",
+                "0000000000000000000WWW00WW000000",
+                "000000000000W00000000WW00WW00000",
+                "000000000000WW00000000WWW0W00000",
+                "0000000WWW00WWWWWWWW000WWWWWWW00",
+                "000000WWWW00WWWWWWWWW000WWWWWWW0",
+                "0000WWWWWWW0WWWWWWWWWWW0WWBBWWW0",
+                "00WWWWW0WWWWWWWWWWWWWWWW0WBBBWW0",
+                "00WWWW0WWWWWWWWWWWWWWWWWWWWBRWW0",
+                "0000000WW00WWWWWWWWWWWWWWWWWWWW0",
+                "000000WWW000WWWWWWWWWWWWWWWWWW00",
+                "000000WW0000WWWWWWWWWWWWWWWW0000",
+                "00000WWW00000WWWWWWWWWWWWWWW0000",
+                "0000WWW0000000000WWWWWWWWWWW0000",
+                "0000WW000000000000WWWWWWWWWW0000",
+                "00000000000000000000WWWWWWW00000",
+                "0000000000000000000000WWWWW00000",
+                "00000000000000000000000WWWWW0000",
+                "0000000000000000000000000WWWW000",
+                "00000000000000000000000000WWWW00",
+                "000000000000000000000000000WWWW0",
+                "0000000000000000000000000000WWWW",
+                "00000000000000000000000000000WW0",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000"
+            ],
+            // 第2帧数据
+            [
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "0000000000000000000000WWW0000000",
+                "0000000000000000000WW00WWW000000",
+                "000000000000000W000WWW0WWW000000",
+                "00000000000000WW0000WW00WWW00000",
+                "00000000000000WW00000WW00WW00000",
+                "000000000000000WWWWW00WW0WWW0000",
+                "00000000000000WWWWWWW00WW0WW0000",
+                "000000000WWW0WWWWWWWWWW0WWWW0000",
+                "000000000WWWWWWWWWWWWWWW0WWWW000",
+                "00000000WWWWWWWWWWWWWWWWWWWWWW00",
+                "00000000WWBBWWWWWWWWWWWWWWBBWWW0",
+                "0000000WWBWWWWWWWWWWWWWWWWBBBWW0",
+                "0000000WWBWW000WWWWWWWWWWWWBRWW0",
+                "0000000WWWWW0000WWWWWWWWWWWWWWW0",
+                "000000000WW000000WWWWWWWWWWWWW00",
+                "000000000WW0000000WWWWWWWWWW0000",
+                "00000000000000000000WWWWWWWW0000",
+                "0000000000000000000000WWWWW00000",
+                "00000000000000000000000WWWW00000",
+                "0000000000000000000000000WWW0000",
+                "00000000000000000000000000WWWW00",
+                "000000000000000000000000000WWWW0",
+                "0000000000000000000000000000WWW0",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000"
+            ],
+            // 第3帧数据
+            [
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000WWW000000000000",
+                "000000000000000000WWW00000000000",
+                "00000000000000WW0000WWW000000000",
+                "00000000000000WWWW000WWW00000000",
+                "000000000000000WWWWW000WW0000000",
+                "00000000000000000WWWW000WW000000",
+                "0000000000000000000WWWW0WWW00000",
+                "000000000000WWWW00000WWWWWWWW000",
+                "0000000WWW0WWWWWWWW000WWWWWWWW00",
+                "00000000WWWWWWWWWWWWW00WWWWWWWW0",
+                "0000000000WWWWWWWWWWWW0WWWBBWWW0",
+                "0000000000WWWWWWWWWWWWWWWWBBBWW0",
+                "0000000000WWWWWWWWWWWWWWWWWBRWW0",
+                "00000000000WWWWWWWWWWWWWWW0WWW00",
+                "000000000000WWWWWWWWWWWWWWW00000",
+                "00000000000000WWWWWWWWWWWWW00000",
+                "00000000000000WWWWWWWWWWWWW00000",
+                "0000000000000WWWW0000WWWWW000000",
+                "0000000000000WWWWW000WW000000000",
+                "00000000000000WWWWW00WWW00000000",
+                "0000000000000000WWWWWWWW00000000",
+                "00000000000000000WWWW0WW00000000",
+                "0000000000000000000000WW00000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000"
+            ],
+            // 第4帧数据
+            [
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000WWWW00000000000000",
+                "000000000000000WWWWW000000000000",
+                "00000000000000000WWWW00000000000",
+                "000000000000WW00000WWW0000000000",
+                "000000000000WWWWWW000WW00WWW0000",
+                "00000000000000WWWWWW00WWWWWWW000",
+                "0000000000000000WWWWW0WWWWWWWW00",
+                "00000000000000000000WWWWWWWWWWW0",
+                "000000000000000WWWWW00WWWWBBWWW0",
+                "0000000000000WWWWWWWW00WWWBBBWW0",
+                "00000000WWW0WWWWWWWWWWW0WWWBRWW0",
+                "000000000WWWWWWWWWWWWWWWWWWWWW00",
+                "0000000000WWWWWWWWWWWWWWWWWW0000",
+                "0000000000WWWWWWWWWWWWWWWWWW0000",
+                "000000000WWWWWWWWWWWWWWWWWWWW000",
+                "0000000000WWWWWWWWWWWWWWWWWWW000",
+                "00000000000WWWWWWWWWWWWWWWWWW000",
+                "000000000000WWWWWWWWWWWWWWWWW000",
+                "00000000000WWWWWWW000000WWWWW000",
+                "00000000000WWWWWW00000000WWW0000",
+                "000000000000WWW00000000000WW0000",
+                "000000000000WWW0000000000WW00000",
+                "0000000000000WWW0000000000000000",
+                "0000000000000WWWW000000000000000",
+                "00000000000000WW0000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000"
+            ],
+            // 第5帧数据
+            [
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "000000000000000WWW00000000000000",
+                "0000000000000000WWWW000000000000",
+                "000000000000WW000WWWW00000000000",
+                "0000000000000WWW00WWWW0000000000",
+                "00000000000000WWWW0WWWW000000000",
+                "000000000000000WWWWW0WWW00000000",
+                "00000000000000000WWWW0WWW0000000",
+                "000000000000000000WWWWWWWWWW0000",
+                "000000000000000000000WWWWWWWWW00",
+                "000000WWW00000000000000WWWWWWW00",
+                "000000WWWW000WWWWWWWW00WWWBBWWW0",
+                "0000000WWW0WWWWWWWWWWWWWWWBBBWW0",
+                "000000000WWWWWWWWWWWWWWWWWWBRWW0",
+                "0000000000WWWWWWWWWWWWWWWWWWWW00",
+                "0000000000WWWWWWWWWWWWWWWWW00000",
+                "0000000000WWWWWWWWWWWWWWWWW00000",
+                "000000000WWWWWWWWWWWWWWWWWW00000",
+                "00000000WWWWWWWWWWWW0000WWWWW000",
+                "0000000WWW000WWWWWW0000000WWWW00",
+                "0000000WWW000000000000000000WW00",
+                "000000WWW00000000000000000000000",
+                "00000WWW000000000000000000000000",
+                "0000WWW0000000000000000000000000",
+                "0000WW00000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000"
+            ],
+            // 第6帧数据
+            [
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "000000000000WWWWW000000000000000",
+                "0000000000000WWWWWWWWW0000000000",
+                "000000000000000WWWWWWWWWW0000000",
+                "000000000000WWWW0000000WWWWWW000",
+                "0000000000000WWWWWW0000WWWWWWW00",
+                "000000000W000000WWWWWWWWWWWWWWW0",
+                "000000000WW000000000000WWWBBWWW0",
+                "000000000WW0WWWWWWWWW000WWBBBWW0",
+                "0000000000WWWWWWWWWWWWWWWWWBRWW0",
+                "000000000WWWWWWWWWWWWWWWWWWWWW00",
+                "00000000WWWWWWWWWWWWWWWWWWWW0000",
+                "00000000WWWWWWWWWWWWWWWWWWWW0000",
+                "00WWWWWWWWWWWWWWWWWWWWWWWWWWW000",
+                "0WWWBWWWWWWWWWWWWWWWWWWWWWWWWWW0",
+                "0WBBWWWWWWWWWW00000000WWWWW00WWW",
+                "0BWWWW000000000000000000000000WW",
+                "0WWW0000000000000000000000000000",
+                "0WW00000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000",
+                "00000000000000000000000000000000"
+            ]
+        ];
+        
+        // 随机选择颜色
+        function randomizeColors() {
+            // 随机选择背景色
+            const newBgIndex = Math.floor(Math.random() * backgroundColors.length);
+            currentBgIndex = newBgIndex;
+            scene.background = new THREE.Color(backgroundColors[currentBgIndex]);
+            
+            // 随机选择粒子配色
+            const newParticleIndex = Math.floor(Math.random() * particleColorSchemes.length);
+            currentParticleIndex = newParticleIndex;
+            
+            // 更新粒子颜色
+            updateToFrame(currentFrame);
+        }
+        
+        // 初始化场景
+        function init() {
+            try {
+                // 创建场景
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(backgroundColors[currentBgIndex]);
+                
+                // 创建相机
+                const aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
+                const viewSize = 25;
+                
+                camera = new THREE.OrthographicCamera(
+                    -viewSize * aspect, viewSize * aspect,
+                    viewSize, -viewSize,
+                    0.1, 1000
+                );
+                camera.position.set(0, 0, 15);
+                camera.lookAt(0, 0, 0);
+                
+                // 创建渲染器
+                renderer = new THREE.WebGLRenderer({ 
+                    antialias: true,
+                    alpha: true
+                });
+                renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                
+                // 设置色调映射
+                renderer.outputEncoding = THREE.sRGBEncoding;
+                renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                renderer.toneMappingExposure = 0.8;
+                
+                canvasContainer.appendChild(renderer.domElement);
+                
+                // 添加光源
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                scene.add(ambientLight);
+                
+                const pointLight = new THREE.PointLight(0xffffff, 1.0);
+                pointLight.position.set(10, 10, 10);
+                scene.add(pointLight);
+                
+                const pointLight2 = new THREE.PointLight(0xffffaa, 0.8);
+                pointLight2.position.set(-10, -10, 5);
+                scene.add(pointLight2);
+                
+                // 创建粒子系统
+                createParticleSystem();
+                
+                // 开始动画循环
+                animate();
+                
+                // 添加窗口大小调整监听
+                window.addEventListener('resize', onWindowResize);
+                
+                // 添加点击事件监听 - 点击随机换颜色
+                canvasContainer.addEventListener('click', randomizeColors);
+                
+            } catch (error) {
+                console.error("初始化错误:", error);
+            }
+        }
+        
+        // 创建粒子系统
+        function createParticleSystem() {
+            updateToFrame(0);
+        }
+        
+        // 更新到特定帧
+        function updateToFrame(frameIndex) {
+            if (!animationFrames[frameIndex] || animationFrames[frameIndex].length === 0) {
+                return;
+            }
+            
+            const frameData = animationFrames[frameIndex];
+            const gridSize = 32;
+            
+            // 收集所有粒子
+            const positions = [];
+            const colors = [];
+            
+            // 获取当前颜色方案
+            const colorScheme = particleColorSchemes[currentParticleIndex];
+            
+            for (let row = 0; row < gridSize; row++) {
+                if (!frameData[row]) continue;
+                
+                for (let col = 0; col < gridSize; col++) {
+                    const char = frameData[row][col];
+                    
+                    // 为W、R、B创建粒子
+                    if (char === 'W' || char === 'R' || char === 'B') {
+                        // 计算位置 (居中显示)
+                        const x = (col - gridSize/2) * 0.8;
+                        const y = (gridSize/2 - row) * 0.8;
+                        
+                        positions.push(x, y, 0);
+                        
+                        // 设置颜色 - 根据当前颜色方案
+                        let colorValue;
+                        if (char === 'W') {
+                            colorValue = colorScheme.W;
+                        } else if (char === 'R') {
+                            colorValue = colorScheme.R;
+                        } else if (char === 'B') {
+                            colorValue = colorScheme.B;
+                        }
+                        
+                        // 转换为THREE.Color
+                        const color = new THREE.Color(colorValue);
+                        colors.push(color.r, color.g, color.b);
+                    }
+                }
+            }
+            
+            // 如果有粒子，则更新几何体
+            if (positions.length > 0) {
+                // 移除旧的粒子系统
+                if (particleSystem) {
+                    scene.remove(particleSystem);
+                }
+                
+                const geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+                geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+                
+                // 创建粒子材质
+                const material = new THREE.PointsMaterial({
+                    size: 4.5,
+                    vertexColors: true,
+                    transparent: true,
+                    opacity: 0.9,
+                    sizeAttenuation: false,
+                    blending: THREE.NormalBlending,
+                    depthWrite: false
+                });
+                
+                particleSystem = new THREE.Points(geometry, material);
+                scene.add(particleSystem);
+            }
+        }
+        
+        // 动画循环
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // 检查是否需要切换帧
+            const currentTime = Date.now();
+            if (currentTime - lastFrameTime >= FRAME_DURATION) {
+                currentFrame = (currentFrame + 1) % animationFrames.length;
+                lastFrameTime = currentTime;
+                
+                // 更新粒子显示
+                updateToFrame(currentFrame);
+            }
+            
+            // 添加简单的旋转动画
+            if (particleSystem) {
+                particleSystem.rotation.y += 0.003;
+                particleSystem.rotation.x += 0.0015;
+            }
+            
+            // 渲染场景
+            renderer.render(scene, camera);
+        }
+        
+        // 窗口大小调整
+        function onWindowResize() {
+            const aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
+            const viewSize = 25;
+            
+            camera.left = -viewSize * aspect;
+            camera.right = viewSize * aspect;
+            camera.top = viewSize;
+            camera.bottom = -viewSize;
+            
+            camera.updateProjectionMatrix();
+            renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('load', function() {
+            setTimeout(init, 100);
+        });
+        
+        // 防止右键菜单
+        canvasContainer.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+    </script>
+</body>
+</html>
