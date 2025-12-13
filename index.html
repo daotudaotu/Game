@@ -6,77 +6,77 @@
     <title>道兔</title>
     <style>
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Courier New', monospace;
-        }
-        
-        body {
-            background-color: #0a0a14;
-            color: #f0f0f0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            background-image: radial-gradient(circle at 20% 30%, #1a1a2e 0%, #0a0a14 100%);
-        }
-        
-        .game-container {
-            width: 100%;
-            max-width: 800px;
-            border: 4px solid #4a3a6d;
-            border-radius: 8px;
-            background-color: #1a1a2a;
-            box-shadow: 0 0 25px rgba(138, 127, 255, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .game-header {
-            background: linear-gradient(to right, #2a1a4a, #3a2a5a);
-            padding: 15px;
-            text-align: center;
-            border-bottom: 3px solid #5a4a7d;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .game-header h1 {
-            font-size: 32px;
-            color: #ff7b9c;
-            text-shadow: 2px 2px 0 #5a2a4a, 4px 4px 0 #000;
-            letter-spacing: 3px;
-            font-weight: bold;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .game-content {
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            min-height: 520px;
-            position: relative;
-        }
-        
-        .character-section {
-            display: flex;
-            margin-bottom: 20px;
-            align-items: flex-end;
-        }
-        
-        .pixel-character {
-            width: 240px;
-            height: 240px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-right: 20px;
-        }
-        
-        .pixel-grid {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Courier New', monospace;
+}
+
+body {
+    background-color: #0a0a14;
+    color: #f0f0f0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-image: radial-gradient(circle at 20% 30%, #1a1a2e 0%, #0a0a14 100%);
+}
+
+.game-container {
+    width: 100%;
+    max-width: 800px;
+    border: 4px solid #4a3a6d;
+    border-radius: 8px;
+    background-color: #1a1a2a;
+    box-shadow: 0 0 25px rgba(138, 127, 255, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    position: relative;
+}
+
+.game-header {
+    background: linear-gradient(to right, #2a1a4a, #3a2a5a);
+    padding: 15px;
+    text-align: center;
+    border-bottom: 3px solid #5a4a7d;
+    position: relative;
+    overflow: hidden;
+}
+
+.game-header h1 {
+    font-size: 32px;
+    color: #ff7b9c;
+    text-shadow: 2px 2px 0 #5a2a4a, 4px 4px 0 #000;
+    letter-spacing: 3px;
+    font-weight: bold;
+    position: relative;
+    z-index: 2;
+}
+
+.game-content {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    min-height: 520px;
+    position: relative;
+}
+
+.character-section {
+    display: flex;
+    margin-bottom: 20px;
+    align-items: flex-end;
+}
+
+.pixel-character {
+    width: 240px;
+    height: 240px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.pixel-grid {
     display: grid;
     grid-template-columns: repeat(16, 1fr);
     grid-template-rows: repeat(16, 1fr);
@@ -85,92 +85,93 @@
     gap: 0;
     image-rendering: pixelated;
 }
-        
-        .pixel {
-            width: 15px;
-            height: 15px;
-        }
-        
-        .dialog-section {
-            flex: 1;
-            background-color: rgba(20, 20, 35, 0.9);
-            border: 3px solid #4a3a6d;
-            border-radius: 6px;
-            padding: 20px;
-            min-height: 200px;
-            position: relative;
-            backdrop-filter: blur(2px);
-        }
-        
-        .dialog-text {
-            font-size: 18px;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            min-height: 140px;
-        }
-        
-        .dialog-text .name {
-            color: #ff7b9c;
-            font-weight: bold;
-            margin-bottom: 10px;
-            display: block;
-            font-size: 20px;
-            text-shadow: 1px 1px 0 #000;
-        }
-        
-        .click-hint {
-            text-align: center;
-            color: #8888cc;
-            font-size: 14px;
-            position: absolute;
-            bottom: 10px;
-            right: 20px;
-            animation: pulse 1.5s infinite;
-        }
-        
-        .options-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 20px;
-        }
-        
-        .option-btn {
-            background: linear-gradient(to right, #3a2a5a, #4a3a6a);
-            border: 2px solid #5a4a7d;
-            color: #f0f0f0;
-            padding: 14px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: left;
-            border-radius: 6px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .option-btn:hover {
-            background: linear-gradient(to right, #4a3a6a, #5a4a7a);
-            border-color: #8a7fff;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(138, 127, 255, 0.3);
-        }
-        
-        .game-footer {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #2a2a3a;
-            border-top: 3px solid #4a3a6d;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .dialog-counter {
-            font-size: 14px;
-            color: #aaaacc;
-        }
-        /* 裂缝图标样式 */
+
+.pixel {
+    width: 15px;
+    height: 15px;
+}
+
+.dialog-section {
+    flex: 1;
+    background-color: rgba(20, 20, 35, 0.9);
+    border: 3px solid #4a3a6d;
+    border-radius: 6px;
+    padding: 20px;
+    min-height: 200px;
+    position: relative;
+    backdrop-filter: blur(2px);
+}
+
+.dialog-text {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    min-height: 140px;
+}
+
+.dialog-text .name {
+    color: #ff7b9c;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: block;
+    font-size: 20px;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.click-hint {
+    text-align: center;
+    color: #8888cc;
+    font-size: 14px;
+    position: absolute;
+    bottom: 10px;
+    right: 20px;
+    animation: pulse 1.5s infinite;
+}
+
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.option-btn {
+    background: linear-gradient(to right, #3a2a5a, #4a3a6a);
+    border: 2px solid #5a4a7d;
+    color: #f0f0f0;
+    padding: 14px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: left;
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+}
+
+.option-btn:hover {
+    background: linear-gradient(to right, #4a3a6a, #5a4a7a);
+    border-color: #8a7fff;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(138, 127, 255, 0.3);
+}
+
+.game-footer {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #2a2a3a;
+    border-top: 3px solid #4a3a6d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dialog-counter {
+    font-size: 14px;
+    color: #aaaacc;
+}
+
+/* 裂缝图标样式 */
 .crack-icon {
     position: absolute;
     top: 15px;
@@ -245,86 +246,269 @@
         transform: translate(0, -80px) scale(0.9);
     }
 }
-        .reset-btn {
-            background: linear-gradient(to right, #6a3a5a, #8a4a6a);
-            border: 2px solid #9a5a7a;
-            color: #f0f0f0;
-            padding: 8px 15px;
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: all 0.3s;
-        }
-        
-        .reset-btn:hover {
-            background: linear-gradient(to right, #8a4a6a, #aa5a7a);
-            border-color: #ff7b9c;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-        
-        @keyframes flicker {
-            0% { opacity: 1; }
-            50% { opacity: 0.9; }
-            100% { opacity: 1; }
-        }
-        
-        .flicker {
-            animation: flicker 0.5s infinite;
-        }
-        
-        .glitch {
-            position: relative;
-        }
-        
-        .glitch::before {
-            content: attr(data-text);
-            position: absolute;
-            left: 2px;
-            text-shadow: -2px 0 #ff7b9c;
-            top: 0;
-            color: white;
-            background: #1a1a2a;
-            overflow: hidden;
-            clip-path: inset(0 0 0 0);
-        }
-        
-        .suspense-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                radial-gradient(circle at 20% 80%, rgba(255, 123, 156, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(138, 127, 255, 0.05) 0%, transparent 50%);
-            z-index: 0;
-        }
-        
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .character-section {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .pixel-character {
-                margin-right: 0;
-                margin-bottom: 20px;
-            }
-            
-            .game-content {
-                padding: 15px;
-            }
-            
-            .game-header h1 {
-                font-size: 24px;
-            }
-        }
+
+.reset-btn {
+    background: linear-gradient(to right, #6a3a5a, #8a4a6a);
+    border: 2px solid #9a5a7a;
+    color: #f0f0f0;
+    padding: 8px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.reset-btn:hover {
+    background: linear-gradient(to right, #8a4a6a, #aa5a7a);
+    border-color: #ff7b9c;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+@keyframes flicker {
+    0% { opacity: 1; }
+    50% { opacity: 0.9; }
+    100% { opacity: 1; }
+}
+
+.flicker {
+    animation: flicker 0.5s infinite;
+}
+
+.glitch {
+    position: relative;
+}
+
+.glitch::before {
+    content: attr(data-text);
+    position: absolute;
+    left: 2px;
+    text-shadow: -2px 0 #ff7b9c;
+    top: 0;
+    color: white;
+    background: #1a1a2a;
+    overflow: hidden;
+    clip-path: inset(0 0 0 0);
+}
+
+.suspense-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(255, 123, 156, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(138, 127, 255, 0.05) 0%, transparent 50%);
+    z-index: 0;
+}
+
+/* 拖动样式 */
+.pixel-character {
+    cursor: grab;
+    transition: transform 0.2s ease;
+    position: relative;
+    z-index: 5;
+}
+
+.pixel-character.dragging {
+    cursor: grabbing;
+    z-index: 1000;
+}
+
+/* 隐藏的红心彩蛋样式 */
+.secret-heart {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 20px;
+    height: 20px;
+    background-color: #ff3366;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1000;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(255, 51, 102, 0.3);
+    user-select: none;
+    animation: heartbeat 2s infinite;
+}
+
+.secret-heart:hover {
+    opacity: 1;
+    transform: scale(1.3);
+    box-shadow: 0 0 20px rgba(255, 51, 102, 0.8);
+}
+
+/* 红心图标绘制 */
+.secret-heart::before,
+.secret-heart::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    width: 10px;
+    height: 16px;
+    background: white;
+    border-radius: 10px 10px 0 0;
+}
+
+.secret-heart::before {
+    left: 2px;
+    transform: rotate(-45deg);
+    transform-origin: 0 100%;
+}
+
+.secret-heart::after {
+    left: 8px;
+    transform: rotate(45deg);
+    transform-origin: 100% 100%;
+}
+
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    5% { transform: scale(1.2); }
+    10% { transform: scale(1.1); }
+    15% { transform: scale(1.3); }
+    20% { transform: scale(1); }
+    100% { transform: scale(1); }
+}
+
+/* 自定义提示框样式 */
+.custom-alert {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.custom-alert.active {
+    opacity: 1;
+}
+
+.custom-alert-content {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    border: 2px solid #ff3366;
+    box-shadow: 0 0 30px rgba(255, 51, 102, 0.5);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.custom-alert.active .custom-alert-content {
+    transform: translateY(0);
+}
+
+.custom-alert h3 {
+    color: #ff3366;
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+}
+
+.custom-alert p {
+    color: #e6e6e6;
+    margin-bottom: 25px;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.alert-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.alert-button {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    min-width: 100px;
+}
+
+.alert-button.yes {
+    background: linear-gradient(135deg, #ff3366, #ff6699);
+    color: white;
+}
+
+.alert-button.yes:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(255, 51, 102, 0.4);
+}
+
+.alert-button.no {
+    background: linear-gradient(135deg, #333, #666);
+    color: white;
+}
+
+.alert-button.no:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(102, 102, 102, 0.4);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .character-section {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .pixel-character {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+    
+    .game-content {
+        padding: 15px;
+    }
+    
+    .game-header h1 {
+        font-size: 24px;
+    }
+    
+    /* 移动端红心图标调整 */
+    .secret-heart {
+        bottom: 15px;
+        right: 15px;
+        width: 25px;
+        height: 25px;
+    }
+    
+    .secret-heart::before,
+    .secret-heart::after {
+        top: 5px;
+        width: 12px;
+        height: 18px;
+    }
+    
+    .secret-heart::before {
+        left: 3px;
+    }
+    
+    .secret-heart::after {
+        left: 10px;
+    }
+}
     </style>
 </head>
 <body>
@@ -368,11 +552,11 @@
         
 
     <script>
-       // 游戏数据
+ // 游戏数据
 const gameData = {
     currentDialogIndex: 0,
     selectedOption: null,
-    // 扩展为200句对话
+    // 简化为20句对话
     dialogs: [
         // 道兔出现 (1-20)
         { name: "???", text: "你...能听到我吗？", expression: "yincang" },
@@ -584,7 +768,6 @@ const gameData = {
         { name: "道兔", text: "或者，继续安于现状，做一个数字世界的观察者。", expression: "shangxin" },
         { name: "道兔", text: "那么，请告诉我你的选择。", expression: "jinzhang" }
     ],
-    // 选项保持不变
     options: [
         { 
             id: "accept",
@@ -604,7 +787,7 @@ const gameData = {
     ]
 };
 
-        // 颜色映射
+// 颜色映射
         const colorMap = {
             '0': 'transparent',      // 透明
             'P': '#ff7b9c',          // 兔子粉色
@@ -830,46 +1013,43 @@ const gameData = {
             ]
         };
 
-        // 初始化游戏
-document.addEventListener('DOMContentLoaded', function() {
-    // 获取所有需要的DOM元素
-    const dialogSection = document.getElementById('dialog-section');
-    const dialogText = document.getElementById('current-dialog');
-    const nameElement = document.querySelector('.name');
-    const optionsContainer = document.getElementById('options-container');
-    const pixelCharacter = document.getElementById('pixel-character');
-    const dialogCounter = document.getElementById('dialog-counter');
-            
-            // 初始渲染像素兔子和对话
-            renderPixelCharacter('yincang');
-            updateDialog();
-            
-            // 点击对话框推进剧情
-dialogSection.addEventListener('click', function() {
-    if (gameData.currentDialogIndex === 49) { // 改为49
-        // 在第50句对话时显示选项，不推进
-        return;
-    }
+// 渲染像素角色
+function renderPixelCharacter(expression) {
+    const pixelGrid = document.getElementById('pixel-character');
+    pixelGrid.innerHTML = '';
     
-    if (gameData.currentDialogIndex < gameData.dialogs.length - 1) {
-        gameData.currentDialogIndex++;
-        updateDialog();
-    }
-});
+    const pixelData = pixelExpressions[expression] || pixelExpressions.yincang;
+    
+    pixelData.forEach(row => {
+        const paddedRow = row.padEnd(16, '0').substring(0, 16);
+        
+        for (let i = 0; i < paddedRow.length; i++) {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel';
+            const colorCode = paddedRow.charAt(i);
+            pixel.style.backgroundColor = colorMap[colorCode] || 'transparent';
             
+            if (colorCode !== '0') {
+                pixel.style.border = '1px solid rgba(0,0,0,0.2)';
+            }
+            
+            pixelGrid.appendChild(pixel);
+        }
+    });
+}
+
 // 更新对话
 function updateDialog() {
-    
-    // 清空选项
+    const optionsContainer = document.getElementById('options-container');
     optionsContainer.innerHTML = '';
     
-    // 检查是否在选项对话（第50句）
-    if (gameData.currentDialogIndex === 49) {
+    // 检查是否在选项对话（第20句）
+    if (gameData.currentDialogIndex === 199) {
         // 显示选项
         const currentDialog = gameData.dialogs[gameData.currentDialogIndex];
-        dialogText.textContent = currentDialog.text;
-        nameElement.textContent = currentDialog.name;
-        renderPixelCharacter('yincang'); // 使用yincang表情
+        document.getElementById('current-dialog').textContent = currentDialog.text;
+        document.querySelector('.name').textContent = currentDialog.name;
+        renderPixelCharacter('jinzhang');
         
         // 创建选项按钮
         gameData.options.forEach((option, index) => {
@@ -877,7 +1057,6 @@ function updateDialog() {
             optionBtn.className = 'option-btn';
             optionBtn.textContent = option.text;
             optionBtn.addEventListener('click', function() {
-                // 实际跳转到不同HTML页面
                 window.location.href = option.link;
             });
             optionsContainer.appendChild(optionBtn);
@@ -888,157 +1067,252 @@ function updateDialog() {
     
     // 正常显示对话
     const currentDialog = gameData.dialogs[gameData.currentDialogIndex];
-    dialogText.textContent = currentDialog.text;
-    nameElement.textContent = currentDialog.name;
+    document.getElementById('current-dialog').textContent = currentDialog.text;
+    document.querySelector('.name').textContent = currentDialog.name;
     
     // 渲染对应的像素表情
     renderPixelCharacter(currentDialog.expression);
-    
-    // 添加悬疑效果（仅在非选项对话时）
-    if (gameData.currentDialogIndex < 49) { // 改为49
-        if (Math.random() > 0.7) {
-            dialogSection.classList.add('flicker');
-            setTimeout(() => {
-                dialogSection.classList.remove('flicker');
-            }, 300);
-        }
-    }
 }
-            
-// 渲染像素角色
-function renderPixelCharacter(expression) {
-    // 获取像素网格容器
-    const pixelCharacter = document.getElementById('pixel-character');
+
+// 初始化游戏
+document.addEventListener('DOMContentLoaded', function() {
+    // 获取DOM元素
+    const dialogSection = document.getElementById('dialog-section');
+    const optionsContainer = document.getElementById('options-container');
+    const pixelCharacter = document.querySelector('.pixel-character');
+    const gameContainer = document.querySelector('.game-container');
     
-    // 清空像素网格
-    pixelCharacter.innerHTML = '';
+    // 初始渲染
+    renderPixelCharacter('yincang');
+    updateDialog();
     
-    // 获取对应表情的像素数据，默认为yincang
-    const pixelData = pixelExpressions[expression] || pixelExpressions.yincang;
-    
-    // 创建像素
-    pixelData.forEach(row => {
-        // 确保每行有16个字符
-        const paddedRow = row.padEnd(16, '0').substring(0, 16);
+    // 点击对话框推进剧情
+    dialogSection.addEventListener('click', function() {
+        if (gameData.currentDialogIndex === 199) {
+            // 在第20句对话时显示选项，不推进
+            return;
+        }
         
-        for (let i = 0; i < paddedRow.length; i++) {
-            const pixel = document.createElement('div');
-            pixel.className = 'pixel';
-            
-            // 获取颜色代码
-            const colorCode = paddedRow.charAt(i);
-            pixel.style.backgroundColor = colorMap[colorCode] || 'transparent';
-            
-            // 如果是非透明像素，添加像素化边框
-            if (colorCode !== '0') {
-                pixel.style.border = '1px solid rgba(0,0,0,0.2)';
-            }
-            
-            pixelCharacter.appendChild(pixel);
+        if (gameData.currentDialogIndex < gameData.dialogs.length - 1) {
+            gameData.currentDialogIndex++;
+            updateDialog();
         }
     });
-                
-                // 添加悬疑效果
-                if (expression === 'close' || expression === 'jinzhang' || expression === 'yincang') {
-                    pixelCharacter.style.animation = 'pulse 0.8s infinite';
-                } else {
-                    pixelCharacter.style.animation = '';
-                }
-            }
-            
-// 添加随机悬疑效果
-setInterval(() => {
-    if (gameData.currentDialogIndex < 49 && Math.random() > 0.8) { // 改为49
-        const dialogTextElement = document.getElementById('current-dialog');
-        const originalText = dialogTextElement.textContent;
-        
-        // 偶尔添加文字闪烁效果
-        if (Math.random() > 0.9) {
-            dialogTextElement.classList.add('glitch');
-            dialogTextElement.setAttribute('data-text', originalText);
-            
-            setTimeout(() => {
-                dialogTextElement.classList.remove('glitch');
-            }, 100);
-        }
-    }
-}, 3000);
-
-// 裂缝图标功能
-const crackIcon = document.getElementById('crack-icon');
-let clickCount = 0;
-
-// 七句劝告文本
-const warningMessages = [
-    "别点那里...",
-    "真的，别点了...",
-    "这不是你应该碰的地方...",
-    "好奇心害死猫...",
-    "停下来还来得及...",
-    "最后一次警告...",
-    "你真的不该这样做..."
-];
-
-// 添加闪光特效
-crackIcon.classList.add('flashing');
-
-// 裂缝图标点击事件
-crackIcon.addEventListener('click', function(event) {
-    event.stopPropagation(); // 防止事件冒泡到对话框
     
-    // 如果点击次数小于7，显示对应的警告消息
-    if (clickCount < 7) {
-        const message = warningMessages[clickCount];
-        
-        // 创建飘字效果
-        createFloatingText(message, event.clientX, event.clientY);
-        
-        // 增加点击计数
-        clickCount++;
-        
-        // 更新图标透明度，使其越来越明显
-        const newOpacity = 0.3 + (clickCount * 0.1);
-        crackIcon.style.opacity = Math.min(newOpacity, 1).toString();
-        
-        console.log(`警告 ${clickCount}: ${message}`);
-    } 
-    // 如果是第八次点击，跳转到4.html
-    else if (clickCount === 7) {
-        // 显示最后一条消息
-        createFloatingText("通往未知领域...", event.clientX, event.clientY);
-        
-        // 延迟跳转，让用户看到最后的消息
-        setTimeout(() => {
-            window.location.href = "4.html";
-        }, 1000);
-        
-        clickCount++; // 防止重复触发
+    // === 替换整个拖动功能部分 ===
+
+// 拖动功能实现 - 修正版
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let initialX = 0;
+let initialY = 0;
+let touchStartX = 0;
+let touchStartY = 0;
+
+// 鼠标移动处理函数
+function handleMouseMove(e) {
+    if (!isDragging) return;
+    
+    // 计算移动距离
+    const deltaX = e.clientX - dragStartX;
+    const deltaY = e.clientY - dragStartY;
+    
+    // 应用移动效果
+    pixelCharacter.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+}
+
+// 触摸移动处理函数
+function handleTouchMove(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - touchStartX;
+    const deltaY = touch.clientY - touchStartY;
+    
+    pixelCharacter.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+}
+
+// 鼠标按下事件
+pixelCharacter.addEventListener('mousedown', function(e) {
+    isDragging = true;
+    pixelCharacter.classList.add('dragging');
+    
+    // 记录初始位置
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    const rect = pixelCharacter.getBoundingClientRect();
+    initialX = rect.left;
+    initialY = rect.top;
+    
+    // 添加移动事件监听
+    document.addEventListener('mousemove', handleMouseMove);
+});
+
+// 鼠标释放事件
+document.addEventListener('mouseup', function(e) {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    pixelCharacter.classList.remove('dragging');
+    
+    // 移除移动事件监听
+    document.removeEventListener('mousemove', handleMouseMove);
+    
+    // 重置位置
+    pixelCharacter.style.transform = 'translate(0, 0)';
+    
+    // 检查是否拖出边界
+    const containerRect = gameContainer.getBoundingClientRect();
+    const characterRect = pixelCharacter.getBoundingClientRect();
+    
+    if (characterRect.right < containerRect.left || 
+        characterRect.left > containerRect.right || 
+        characterRect.bottom < containerRect.top || 
+        characterRect.top > containerRect.bottom) {
+        window.location.href = '6.html';
     }
 });
 
-// 创建飘字效果函数
-function createFloatingText(text, x, y) {
-    const floatingText = document.createElement('div');
-    floatingText.className = 'floating-text';
-    floatingText.textContent = text;
+// 触摸开始事件
+pixelCharacter.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    isDragging = true;
+    pixelCharacter.classList.add('dragging');
     
-    // 设置随机偏移量，使飘字更有自然感
-    const randomX = (Math.random() - 0.5) * 100;
+    const touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    const rect = pixelCharacter.getBoundingClientRect();
+    initialX = rect.left;
+    initialY = rect.top;
     
-    floatingText.style.left = `${x + randomX}px`;
-    floatingText.style.top = `${y}px`;
+    document.addEventListener('touchmove', handleTouchMove);
+});
+
+// 触摸结束事件
+document.addEventListener('touchend', function(e) {
+    if (!isDragging) return;
     
-    // 添加到页面
-    document.body.appendChild(floatingText);
+    isDragging = false;
+    pixelCharacter.classList.remove('dragging');
+    document.removeEventListener('touchmove', handleTouchMove);
     
-    // 动画结束后移除元素
-    setTimeout(() => {
-        if (floatingText.parentNode) {
-            floatingText.parentNode.removeChild(floatingText);
-        }
-    }, 2500);
-}
+    pixelCharacter.style.transform = 'translate(0, 0)';
+    
+    const containerRect = gameContainer.getBoundingClientRect();
+    const characterRect = pixelCharacter.getBoundingClientRect();
+    
+    if (characterRect.right < containerRect.left || 
+        characterRect.left > containerRect.right || 
+        characterRect.bottom < containerRect.top || 
+        characterRect.top > containerRect.bottom) {
+        window.location.href = '6.html';
+    }
+});
+
+// 防止拖动时选中文本
+document.addEventListener('selectstart', function(e) {
+    if (isDragging) {
+        e.preventDefault();
+    }
+});
+
+// === 拖动功能结束 ===
+    
+    // 裂缝图标功能
+    const crackIcon = document.getElementById('crack-icon');
+    let clickCount = 0;
+    const warningMessages = [
+        "别点那里...", "真的，别点了...", "这不是你应该碰的地方...", 
+        "好奇心害死猫...", "停下来还来得及...", "最后一次警告...", "你真的不该这样做..."
+    ];
+    
+    if (crackIcon) {
+        crackIcon.addEventListener('click', function(event) {
+            event.stopPropagation();
+            
+            // 如果点击次数小于7，显示对应的警告消息
+            if (clickCount < 7) {
+                const message = warningMessages[clickCount];
+                clickCount++;
+                
+                // 更新图标透明度，使其越来越明显
+                const newOpacity = 0.3 + (clickCount * 0.1);
+                crackIcon.style.opacity = Math.min(newOpacity, 1).toString();
+            } 
+            // 如果是第八次点击，跳转到4.html
+            else if (clickCount === 7) {
+                window.location.href = "4.html";
+                clickCount++; // 防止重复触发
+            }
         });
-    </script>
+    }
+    
+    // 红心彩蛋
+    const secretHeart = document.getElementById('secret-heart');
+    if (secretHeart) {
+        secretHeart.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            // 显示提示框
+            const alertOverlay = document.createElement('div');
+            alertOverlay.className = 'custom-alert';
+            
+            const alertContent = document.createElement('div');
+            alertContent.className = 'custom-alert-content';
+            
+            alertContent.innerHTML = `
+                <h3>🎯 发现彩蛋！</h3>
+                <p>你发现道兔的秘密花园了！<br>去看看吗？</p>
+                <div class="alert-buttons">
+                    <button class="alert-button yes">去看看！</button>
+                    <button class="alert-button no">先不了</button>
+                </div>
+            `;
+            
+            alertOverlay.appendChild(alertContent);
+            document.body.appendChild(alertOverlay);
+            
+            // 显示提示框
+            setTimeout(() => {
+                alertOverlay.classList.add('active');
+            }, 10);
+            
+            // 绑定按钮事件
+            const yesBtn = alertContent.querySelector('.alert-button.yes');
+            const noBtn = alertContent.querySelector('.alert-button.no');
+            
+            yesBtn.addEventListener('click', () => {
+                alertOverlay.classList.remove('active');
+                setTimeout(() => {
+                    document.body.removeChild(alertOverlay);
+                }, 300);
+                window.location.href = 'https://daoturabbit.github.io/-/';
+            });
+            
+            noBtn.addEventListener('click', () => {
+                alertOverlay.classList.remove('active');
+                setTimeout(() => {
+                    document.body.removeChild(alertOverlay);
+                }, 300);
+            });
+            
+            // 点击背景关闭
+            alertOverlay.addEventListener('click', (e) => {
+                if (e.target === alertOverlay) {
+                    alertOverlay.classList.remove('active');
+                    setTimeout(() => {
+                        document.body.removeChild(alertOverlay);
+                    }, 300);
+                }
+            });
+        });
+    }
+});
+　　</script>
+<!-- 隐藏的红心彩蛋 -->
+<div id="secret-heart" class="secret-heart"></div>
 </body>
 </html>
