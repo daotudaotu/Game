@@ -174,8 +174,8 @@ body {
 /* 裂缝图标样式 */
 .crack-icon {
     position: absolute;
-    top: 15px;
-    right: 15px;
+    top: 50px;
+    right: 20px;
     width: 30px;
     height: 30px;
     cursor: pointer;
@@ -519,12 +519,15 @@ body {
         </div>
         
         <div class="game-content">
-            <div class="character-section">
-                <div class="pixel-character">
-                    <div class="pixel-grid" id="pixel-character">
-                        <!-- 像素兔子将由JavaScript动态生成 -->
-                    </div>
-                     <!-- 裂缝图标 -->
+<!-- 修改这部分HTML结构 -->
+<div class="character-section">
+    <div class="pixel-character">
+        <div class="pixel-grid" id="pixel-character">
+            <!-- 像素兔子将由JavaScript动态生成 -->
+        </div>
+    </div>
+    
+    <!-- 将裂缝图标移到像素兔子外部，但在同一区域 -->
     <svg class="crack-icon" id="crack-icon" viewBox="0 0 100 100">
         <!-- 主裂缝线 -->
         <path class="crack-line" d="M30,20 Q40,15 50,25 Q60,35 55,45 Q50,55 60,65 Q70,75 65,85" 
@@ -534,9 +537,8 @@ body {
         <path class="crack-line" d="M55,35 L60,30" fill="none" stroke="#ff6b8b" stroke-width="1.2"/>
         <path class="crack-line" d="M60,70 L65,65" fill="none" stroke="#ff6b8b" stroke-width="1.2"/>
     </svg>
-                </div>
-                
-                <div class="dialog-section" id="dialog-section">
+    
+    <div class="dialog-section" id="dialog-section">
                     <div class="dialog-text" id="dialog-text">
                         <span class="name">???</span>
                         <span id="current-dialog">我一直在看着你。从这个页面被创建开始，我就一直在这里。想知道我是谁吗？</span>
@@ -1038,21 +1040,29 @@ function renderPixelCharacter(expression) {
     });
 }
 
-// 更新对话
+// 更新对话函数
 function updateDialog() {
     const optionsContainer = document.getElementById('options-container');
+    const clickHint = document.querySelector('.click-hint');
+    
+    // 清空选项容器
     optionsContainer.innerHTML = '';
     
-    // 检查是否在选项对话（第20句）
-    if (gameData.currentDialogIndex === 199) {
-        // 显示选项
-        const currentDialog = gameData.dialogs[gameData.currentDialogIndex];
-        document.getElementById('current-dialog').textContent = currentDialog.text;
-        document.querySelector('.name').textContent = currentDialog.name;
-        renderPixelCharacter('jinzhang');
+    // 获取当前对话
+    const currentDialog = gameData.dialogs[gameData.currentDialogIndex];
+    document.getElementById('current-dialog').textContent = currentDialog.text;
+    document.querySelector('.name').textContent = currentDialog.name;
+    
+    // 渲染对应的像素表情
+    renderPixelCharacter(currentDialog.expression);
+    
+    // 检查是否是最后一句对话（显示选项）
+    if (gameData.currentDialogIndex === gameData.dialogs.length - 1) {
+        // 隐藏点击提示
+        clickHint.style.display = 'none';
         
         // 创建选项按钮
-        gameData.options.forEach((option, index) => {
+        gameData.options.forEach((option) => {
             const optionBtn = document.createElement('button');
             optionBtn.className = 'option-btn';
             optionBtn.textContent = option.text;
@@ -1061,22 +1071,15 @@ function updateDialog() {
             });
             optionsContainer.appendChild(optionBtn);
         });
-        
-        return;
+    } else {
+        // 显示点击提示
+        clickHint.style.display = 'block';
     }
-    
-    // 正常显示对话
-    const currentDialog = gameData.dialogs[gameData.currentDialogIndex];
-    document.getElementById('current-dialog').textContent = currentDialog.text;
-    document.querySelector('.name').textContent = currentDialog.name;
-    
-    // 渲染对应的像素表情
-    renderPixelCharacter(currentDialog.expression);
 }
 
 // 初始化游戏
 document.addEventListener('DOMContentLoaded', function() {
-    // 获取DOM元素
+    // 获取DOM元素（确保在DOM加载完成后获取）
     const dialogSection = document.getElementById('dialog-section');
     const optionsContainer = document.getElementById('options-container');
     const pixelCharacter = document.querySelector('.pixel-character');
@@ -1086,17 +1089,16 @@ document.addEventListener('DOMContentLoaded', function() {
     renderPixelCharacter('yincang');
     updateDialog();
     
-    // 点击对话框推进剧情
+    // 点击对话框推进剧情（正确的绑定位置）
     dialogSection.addEventListener('click', function() {
-        if (gameData.currentDialogIndex === 199) {
-            // 在第20句对话时显示选项，不推进
+        // 如果是最后一句，不推进（已经显示选项）
+        if (gameData.currentDialogIndex >= gameData.dialogs.length - 1) {
             return;
         }
         
-        if (gameData.currentDialogIndex < gameData.dialogs.length - 1) {
-            gameData.currentDialogIndex++;
-            updateDialog();
-        }
+        // 推进对话
+        gameData.currentDialogIndex++;
+        updateDialog();
     });
     
     // === 替换整个拖动功能部分 ===
@@ -1222,33 +1224,55 @@ document.addEventListener('selectstart', function(e) {
 // === 拖动功能结束 ===
     
     // 裂缝图标功能
-    const crackIcon = document.getElementById('crack-icon');
-    let clickCount = 0;
-    const warningMessages = [
-        "别点那里...", "真的，别点了...", "这不是你应该碰的地方...", 
-        "好奇心害死猫...", "停下来还来得及...", "最后一次警告...", "你真的不该这样做..."
-    ];
-    
-    if (crackIcon) {
-        crackIcon.addEventListener('click', function(event) {
-            event.stopPropagation();
+const crackIcon = document.getElementById('crack-icon');
+let clickCount = 0;
+const warningMessages = [
+    "别点那里...", "真的，别点了...", "这不是你应该碰的地方...", 
+    "好奇心害死猫...", "停下来还来得及...", "最后一次警告...", "你真的不该这样做..."
+];
+
+if (crackIcon) {
+    crackIcon.addEventListener('click', function(event) {
+        event.stopPropagation();
+        
+        // 显示警告消息（前7次点击）
+        if (clickCount < warningMessages.length) {
+            const message = warningMessages[clickCount];
+            clickCount++;
             
-            // 如果点击次数小于7，显示对应的警告消息
-            if (clickCount < 7) {
-                const message = warningMessages[clickCount];
-                clickCount++;
-                
-                // 更新图标透明度，使其越来越明显
-                const newOpacity = 0.3 + (clickCount * 0.1);
-                crackIcon.style.opacity = Math.min(newOpacity, 1).toString();
-            } 
-            // 如果是第八次点击，跳转到4.html
-            else if (clickCount === 7) {
-                window.location.href = "4.html";
-                clickCount++; // 防止重复触发
-            }
-        });
-    }
+            // 创建浮动提示
+            const floatTip = document.createElement('div');
+            floatTip.className = 'floating-text';
+            floatTip.textContent = message;
+            floatTip.style.left = (event.clientX - 50) + 'px';
+            floatTip.style.top = (event.clientY - 20) + 'px';
+            document.body.appendChild(floatTip);
+            
+            // 更新图标透明度，使其越来越明显
+            const newOpacity = 0.3 + (clickCount * 0.1);
+            crackIcon.style.opacity = Math.min(newOpacity, 1).toString();
+            
+            // 添加闪烁效果
+            crackIcon.classList.add('flashing');
+            setTimeout(() => {
+                crackIcon.classList.remove('flashing');
+            }, 1500);
+            
+            // 2秒后移除浮动提示
+            setTimeout(() => {
+                if (floatTip.parentNode) {
+                    floatTip.parentNode.removeChild(floatTip);
+                }
+            }, 2000);
+        } 
+        // 第8次点击跳转
+        else if (clickCount === warningMessages.length) {
+            window.location.href = "4.html";
+            clickCount++; // 防止重复触发
+        }
+    });
+}
+
     
     // 红心彩蛋
     const secretHeart = document.getElementById('secret-heart');
